@@ -23,9 +23,10 @@ public class ClubController : MonoBehaviour
     private SpriteRenderer currentClubSR;
     private int currentClubIndex;
     public ClubObject[] clubs;
-    public static Action<Sprite> changedClub;
+    public static Action<Sprite, int> changedClub;
 
     Vector3 mousePos;
+    private bool isRight;
 
 	#region Collision Detection Vars
 	Vector2 preRotation;
@@ -50,7 +51,7 @@ public class ClubController : MonoBehaviour
         currentClubIndex = 0;
         currentClub = clubs[currentClubIndex];
         currentClubSR.sprite = currentClub.clubVisual;
-        changedClub?.Invoke(currentClub.UIVisual);
+        changedClub?.Invoke(currentClub.UIVisual, currentClubIndex);
     }
 
     // Update is called once per frame
@@ -79,6 +80,11 @@ public class ClubController : MonoBehaviour
 				}
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.F))
+		{
+            ChangeSide();
+		}
     }
 
 	private void FixedUpdate()
@@ -169,6 +175,21 @@ public class ClubController : MonoBehaviour
         currentClubIndex = index;
         currentClub = clubs[currentClubIndex];
         currentClubSR.sprite = currentClub.clubVisual;
-        changedClub?.Invoke(currentClub.UIVisual);
+        changedClub?.Invoke(currentClub.UIVisual, index);
     }
+
+    private void ChangeSide()
+	{
+        if (!isRight)
+		{
+            transform.position += new Vector3(.6f, 0f, 0f);
+            currentClubSR.flipX = true;
+            isRight = true;
+		} else
+		{
+            transform.position -= new Vector3(.6f, 0f, 0f);
+            currentClubSR.flipX = false;
+            isRight = false;
+        }
+	}
 }

@@ -15,6 +15,11 @@ public class GameManager : MonoBehaviour
 		CheckForEnd.levelComplete -= EndLevel;
 	}
 
+	private void Awake()
+	{
+		//Time.timeScale = .5f;
+	}
+
 	private void Update()
 	{
 		if (Input.GetKeyDown(KeyCode.R))
@@ -22,6 +27,11 @@ public class GameManager : MonoBehaviour
 			Scene scene = SceneManager.GetActiveScene();
 			SceneManager.LoadScene(scene.buildIndex);
 		}
+
+		if (Input.GetKey(KeyCode.T))
+			Time.timeScale = 2f;
+		else
+			Time.timeScale = 1f;
 	}
 
 	public void EndLevel()

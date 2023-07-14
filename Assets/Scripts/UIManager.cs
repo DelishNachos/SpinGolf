@@ -2,13 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class UIManager : MonoBehaviour
 {
     public GameObject ballIndicator;
     public RectTransform ballTransform;
 
-	public Image clubSR;
+	public RectTransform clubSpriteHolder;
+	public RectTransform[] clubTransforms;
+	private int currentIndex = 1;
+	[SerializeField] private float animationTime;
 
 	private float ballHeight;
 
@@ -52,8 +56,12 @@ public class UIManager : MonoBehaviour
 		ballTransform.localScale = new Vector3(ballSize, ballSize, ballSize);
 	}
 
-	private void ChangeClubIcon(Sprite sprite)
+	private void ChangeClubIcon(Sprite sprite, int index)
 	{
-		clubSR.sprite = sprite;
+		float moveAmount = (index - currentIndex) * -50f;
+		clubSpriteHolder.DOLocalMoveX(clubSpriteHolder.localPosition.x + moveAmount, animationTime);
+		clubTransforms[currentIndex].DOScale(1, animationTime);
+		clubTransforms[index].DOScale(2, animationTime);
+		currentIndex = index;
 	}
 }
