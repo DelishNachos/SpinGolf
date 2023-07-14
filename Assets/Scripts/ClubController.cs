@@ -1,12 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class ClubController : MonoBehaviour
 {
+    private KeyCode[] keyCodes = {
+        KeyCode.Alpha1,
+        KeyCode.Alpha2,
+        KeyCode.Alpha3,
+        KeyCode.Alpha4,
+        KeyCode.Alpha5,
+        KeyCode.Alpha6,
+        KeyCode.Alpha7,
+        KeyCode.Alpha8,
+        KeyCode.Alpha9,
+        KeyCode.Alpha0
+    };
+
     public Transform clubVisual;
-    public ClubObject currentClub;
+    private ClubObject currentClub;
+    private SpriteRenderer currentClubSR;
+    private int currentClubIndex;
     public ClubObject[] clubs;
+    public static Action<Sprite> changedClub;
 
     Vector3 mousePos;
 
@@ -28,8 +45,12 @@ public class ClubController : MonoBehaviour
 	void Start()
     {
         transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-        preRotation = transform.rotation.eulerAngles;
-        newRotation = preRotation;
+        Invoke("TurnOnHit", .2f);
+        currentClubSR = clubVisual.gameObject.GetComponent<SpriteRenderer>();
+        currentClubIndex = 0;
+        currentClub = clubs[currentClubIndex];
+        currentClubSR.sprite = currentClub.clubVisual;
+        changedClub?.Invoke(currentClub.UIVisual);
     }
 
     // Update is called once per frame
@@ -37,11 +58,27 @@ public class ClubController : MonoBehaviour
     {
         if (canMove)
             LookAtMouse();
-       
-        if (Input.GetKeyDown(KeyCode.E))
-		{
-            canHit = true;
+
+        if (Input.GetKeyDown(KeyCode.E)) {
+            ChangeClubForward();
 		}
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            ChangeClubBackward();
+        }
+
+        for (int i = 0; i < keyCodes.Length; i++)
+        {
+            if (Input.GetKeyDown(keyCodes[i]))
+            {
+                int numPressed = i + 1;
+                if (i < clubs.Length)
+				{
+                    ChangeClubIndex(i);
+				}
+            }
+        }
     }
 
 	private void FixedUpdate()
@@ -59,7 +96,7 @@ public class ClubController : MonoBehaviour
         for (int i = 0; i < rayAmount; i++)
 		{
             rayDirection = Quaternion.AngleAxis(i * angleStep, transform.forward) * preRotation;
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, rayDirection, clubVisual.localScale.y, rayLayerMask);
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, rayDirection, 2f, rayLayerMask);
             if (hit.collider != null)
 			{
                 if (hit.collider.tag == "Ball")
@@ -67,14 +104,9 @@ public class ClubController : MonoBehaviour
                     Rigidbody2D rb = hit.collider.GetComponent<Rigidbody2D>();
                     if (rb.velocity.magnitude >= .25f)
 					{
-                        Debug.Log("Moving");
                         return;
-					} else
-					{
-                        Debug.Log("Still");
-                        Debug.Log(angularVelocity);
 					}
-                    rb.AddForce(((Quaternion.Euler(0f, 0f, 90f + currentClub.clubAngle) * rayDirection).normalized * (angularVelocity / forceDamp) * currentClub.clubPower), ForceMode2D.Impulse);
+                    rb.AddForce(Vector2.ClampMagnitude((Quaternion.Euler(0f, 0f, 90f + currentClub.clubAngle) * rayDirection).normalized * (angularVelocity / forceDamp), currentClub.clubMaxPower), ForceMode2D.Impulse);
                     Debug.Log(rb.velocity);
                     /*canMove = false;
                     float rotZ = Mathf.Atan2(rayDirection.y, rayDirection.x) * Mathf.Rad2Deg;
@@ -100,11 +132,43 @@ public class ClubController : MonoBehaviour
         return Vector2.SignedAngle(preRotation, newRotation);
     }
 
-	private void OnDrawGizmos()
+    private void TurnOnHit()
+	{
+        canHit = true;
+	}
+
+	/*private void OnDrawGizmos()
 	{
         Gizmos.color = Color.red;
         Gizmos.DrawRay(new Ray(transform.position, transform.right));
         Gizmos.DrawRay(new Ray(Vector3.zero + new Vector3(0f, 2f, 0f), Quaternion.Euler(0f, 0f, 90f) * rayDirection));
-	}
+	}*/
 
+    private void ChangeClubForward()
+	{
+        int changeIndex = currentClubIndex + 1;
+        if (changeIndex >= clubs.Length)
+		{
+            changeIndex = 0;
+		}
+        ChangeClubIndex(changeIndex);
+    }
+
+    private void ChangeClubBackward()
+	{
+        int changeIndex = currentClubIndex - 1;
+        if (changeIndex < 0)
+        {
+            changeIndex = clubs.Length - 1;
+        }
+        ChangeClubIndex(changeIndex);
+    }
+
+    private void ChangeClubIndex(int index)
+	{
+        currentClubIndex = index;
+        currentClub = clubs[currentClubIndex];
+        currentClubSR.sprite = currentClub.clubVisual;
+        changedClub?.Invoke(currentClub.UIVisual);
+    }
 }

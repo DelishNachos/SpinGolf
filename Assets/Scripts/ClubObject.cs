@@ -7,5 +7,7 @@ public class ClubObject : ScriptableObject
 {
     public string clubName;
     public float clubAngle;
-    public float clubPower = 1;
+    public float clubMaxPower = 1;
+    public Sprite clubVisual;
+    public Sprite UIVisual;
 }

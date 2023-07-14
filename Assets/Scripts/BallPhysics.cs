@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class BallPhysics : MonoBehaviour
 {
     private Rigidbody2D rb;
+    private GameObject cameraConfider;
 
     private bool isgrounded;
     public LayerMask layerMask;
@@ -13,9 +15,13 @@ public class BallPhysics : MonoBehaviour
     public float groundDrag;
     public float airDrag;
 
+    public static Action<bool, float> ballOffCamera;
+    private bool calledEvent;
+
 	private void Awake()
 	{
         rb = GetComponent<Rigidbody2D>();
+        cameraConfider = GameObject.FindGameObjectWithTag("CameraConfider");
 	}
 
 	void Update()
@@ -27,6 +33,18 @@ public class BallPhysics : MonoBehaviour
 		} else
 		{
             rb.drag = airDrag;
+		}
+
+        if (cameraConfider == null)
+            return;
+
+        if (transform.position.y > cameraConfider.GetComponent<Collider2D>().bounds.max.y && !calledEvent)
+		{
+            ballOffCamera?.Invoke(true, transform.position.y - cameraConfider.GetComponent<Collider2D>().bounds.max.y);
+            
+		} else
+		{
+            ballOffCamera?.Invoke(false, transform.position.y);
 		}
     }
 }
