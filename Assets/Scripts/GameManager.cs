@@ -32,6 +32,12 @@ public class GameManager : MonoBehaviour
 			Time.timeScale = 2f;
 		else
 			Time.timeScale = 1f;
+
+		if (Input.GetKeyDown(KeyCode.N))
+		{
+			DataHolder.hasWedge = true;
+			DataHolder.UpdateClub();
+		}
 	}
 
 	public void EndLevel()

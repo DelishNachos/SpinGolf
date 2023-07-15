@@ -11,7 +11,10 @@ public class UIManager : MonoBehaviour
 
 	public RectTransform clubSpriteHolder;
 	public RectTransform[] clubTransforms;
-	private int currentIndex = 1;
+
+	public Sprite[] lockedClubSprites;
+	public Sprite[] unlockedClubSprites;
+	private int currentIndex = 0;
 	[SerializeField] private float animationTime;
 
 	private float ballHeight;
@@ -26,12 +29,35 @@ public class UIManager : MonoBehaviour
 	{
 		BallPhysics.ballOffCamera += ToggleIndicator;
 		ClubController.changedClub += ChangeClubIcon;
+		DataHolder.addedClub += SpriteEventCatcher;
 	}
 
 	private void OnDisable()
 	{
 		BallPhysics.ballOffCamera -= ToggleIndicator;
 		ClubController.changedClub -= ChangeClubIcon;
+		DataHolder.addedClub -= SpriteEventCatcher;
+	}
+
+	private void Start()
+	{
+		for (int i = 0; i < clubTransforms.Length; i++)
+		{
+			UpdateClubSprites(i, lockedClubSprites[i]);
+		}
+
+		if (DataHolder.hasPutter)
+		{
+			UpdateClubSprites(0, unlockedClubSprites[0]);
+		}
+		if (DataHolder.hasWedge)
+		{
+			UpdateClubSprites(1, unlockedClubSprites[1]);
+		}
+		if (DataHolder.hasDriver)
+		{
+			UpdateClubSprites(2, unlockedClubSprites[2]);
+		}
 	}
 
 	private void Update()
@@ -56,12 +82,33 @@ public class UIManager : MonoBehaviour
 		ballTransform.localScale = new Vector3(ballSize, ballSize, ballSize);
 	}
 
-	private void ChangeClubIcon(Sprite sprite, int index)
+	private void ChangeClubIcon(int index)
 	{
 		float moveAmount = (index - currentIndex) * -50f;
 		clubSpriteHolder.DOLocalMoveX(clubSpriteHolder.localPosition.x + moveAmount, animationTime);
 		clubTransforms[currentIndex].DOScale(1, animationTime);
 		clubTransforms[index].DOScale(2, animationTime);
 		currentIndex = index;
+	}
+
+	private void UpdateClubSprites(int index, Sprite sprite)
+	{
+		clubTransforms[index].gameObject.GetComponent<Image>().sprite = sprite;
+	}
+
+	private void SpriteEventCatcher(ClubObject club)
+	{
+		if (club == DataHolder.putter)
+		{
+			UpdateClubSprites(0, unlockedClubSprites[0]);
+		}
+		else if (club == DataHolder.wedge)
+		{
+			UpdateClubSprites(1, unlockedClubSprites[1]);
+		}
+		else if (club == DataHolder.driver)
+		{
+			UpdateClubSprites(2, unlockedClubSprites[2]);
+		}
 	}
 }

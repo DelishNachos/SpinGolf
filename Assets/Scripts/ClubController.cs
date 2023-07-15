@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using DG.Tweening;
 
 public class ClubController : MonoBehaviour
 {
@@ -22,8 +23,8 @@ public class ClubController : MonoBehaviour
     private ClubObject currentClub;
     private SpriteRenderer currentClubSR;
     private int currentClubIndex;
-    public ClubObject[] clubs;
-    public static Action<Sprite, int> changedClub;
+    public List<ClubObject> clubs;
+    public static Action<int> changedClub;
 
     Vector3 mousePos;
     private bool isRight;
@@ -42,21 +43,39 @@ public class ClubController : MonoBehaviour
     public float forceDamp;
 	#endregion
 
+	private void OnEnable()
+	{
+        BallPhysics.stopped += MoveClub;
+        DataHolder.addedClub += UpdateClubList;
+	}
+
+	private void OnDisable()
+	{
+        BallPhysics.stopped -= MoveClub;
+        DataHolder.addedClub -= UpdateClubList;
+    }
+
 	// Start is called before the first frame update
 	void Start()
     {
         transform.rotation = Quaternion.Euler(0f, 0f, 0f);
         Invoke("TurnOnHit", .2f);
         currentClubSR = clubVisual.gameObject.GetComponent<SpriteRenderer>();
-        currentClubIndex = 0;
-        currentClub = clubs[currentClubIndex];
-        currentClubSR.sprite = currentClub.clubVisual;
-        changedClub?.Invoke(currentClub.UIVisual, currentClubIndex);
+        
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (DataHolder.hasPutter && (clubs == null || clubs.Count == 0))
+		{
+            UpdateClubList(DataHolder.putter);
+            currentClubIndex = 0;
+            currentClub = clubs[currentClubIndex];
+            currentClubSR.sprite = currentClub.clubVisual;
+            //changedClub?.Invoke(currentClub.UIVisual, 0);
+        }
+
         if (canMove)
             LookAtMouse();
 
@@ -74,7 +93,7 @@ public class ClubController : MonoBehaviour
             if (Input.GetKeyDown(keyCodes[i]))
             {
                 int numPressed = i + 1;
-                if (i < clubs.Length)
+                if (i < clubs.Count)
 				{
                     ChangeClubIndex(i);
 				}
@@ -153,7 +172,7 @@ public class ClubController : MonoBehaviour
     private void ChangeClubForward()
 	{
         int changeIndex = currentClubIndex + 1;
-        if (changeIndex >= clubs.Length)
+        if (changeIndex >= clubs.Count)
 		{
             changeIndex = 0;
 		}
@@ -165,17 +184,21 @@ public class ClubController : MonoBehaviour
         int changeIndex = currentClubIndex - 1;
         if (changeIndex < 0)
         {
-            changeIndex = clubs.Length - 1;
+            changeIndex = clubs.Count - 1;
         }
         ChangeClubIndex(changeIndex);
     }
 
     private void ChangeClubIndex(int index)
 	{
+        if (currentClubIndex == index)
+            return;
+
         currentClubIndex = index;
+        DataHolder.currentClubIndex = currentClubIndex;
         currentClub = clubs[currentClubIndex];
         currentClubSR.sprite = currentClub.clubVisual;
-        changedClub?.Invoke(currentClub.UIVisual, index);
+        changedClub?.Invoke(index);
     }
 
     private void ChangeSide()
@@ -191,5 +214,35 @@ public class ClubController : MonoBehaviour
             currentClubSR.flipX = false;
             isRight = false;
         }
+	}
+
+    private void MoveClub(Vector2 ballPos)
+	{
+        Debug.Log("Club Moved");
+        canHit = false;
+        TweenCallback tweenCallback = null;
+        tweenCallback += ResetRotations;
+        tweenCallback += TurnOnHit;
+        transform.DOMove(new Vector3(ballPos.x - .3f, ballPos.y + 1.85f, 0f), 1f).OnComplete(tweenCallback);
+	}
+
+    private void ResetRotations()
+	{
+        preRotation = mousePos - transform.position;
+        newRotation = preRotation;
+        Debug.Log("Reset Rotations");
+	}
+
+    private void UpdateClubList(ClubObject club)
+	{
+        if (clubs == null)
+		{
+            clubs = new List<ClubObject>();
+		}
+
+        if (clubs.Contains(club))
+            return;
+
+        clubs.Add(club);
 	}
 }

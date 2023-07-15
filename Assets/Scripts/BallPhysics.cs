@@ -16,6 +16,8 @@ public class BallPhysics : MonoBehaviour
     public float airDrag;
 
     public static Action<bool, float> ballOffCamera;
+    public static Action<Vector2> stopped;
+    private bool isStopped = true;
     private bool calledEvent;
 
 	private void Awake()
@@ -33,6 +35,18 @@ public class BallPhysics : MonoBehaviour
 		} else
 		{
             rb.drag = airDrag;
+		}
+
+        if (rb.velocity.magnitude < .1f)
+		{
+            if (!isStopped)
+			{
+                stopped?.Invoke(rb.transform.position);
+                isStopped = true;
+			}
+		} else
+		{
+            isStopped = false;
 		}
 
         if (cameraConfider == null)
