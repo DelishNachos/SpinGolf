@@ -47,12 +47,14 @@ public class ClubController : MonoBehaviour
 	{
         BallPhysics.stopped += MoveClub;
         DataHolder.addedClub += UpdateClubList;
+        CameraControls.movingEvent += CanRotateEvent;
 	}
 
 	private void OnDisable()
 	{
         BallPhysics.stopped -= MoveClub;
         DataHolder.addedClub -= UpdateClubList;
+        CameraControls.movingEvent -= CanRotateEvent;
     }
 
 	// Start is called before the first frame update
@@ -159,6 +161,7 @@ public class ClubController : MonoBehaviour
 
     private void TurnOnHit()
 	{
+        ResetRotations();
         canHit = true;
 	}
 
@@ -244,5 +247,17 @@ public class ClubController : MonoBehaviour
             return;
 
         clubs.Add(club);
+	}
+
+    private void CanRotateEvent(bool bl)
+	{
+        canMove = !bl;
+        if (!bl)
+		{
+            Invoke("TurnOnHit", Time.fixedDeltaTime);
+		} else
+		{
+            canHit = false;
+		}
 	}
 }
