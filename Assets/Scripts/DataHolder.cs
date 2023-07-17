@@ -7,8 +7,8 @@ public static class DataHolder
 {
     public static Action<ClubObject> addedClub;
 
-    public static bool hasPutter = true;
-    private static bool _hasputter = true;
+    public static bool hasPutter;
+    private static bool _hasputter;
     public static bool hasWedge;
     private static bool _haswedge;
     public static bool hasDriver;
@@ -26,11 +26,13 @@ public static class DataHolder
 		{
             addedClub?.Invoke(putter);
             _hasputter = true;
-		} else if (hasWedge != _haswedge)
+		}
+        if (hasWedge != _haswedge)
         {
             addedClub?.Invoke(wedge);
             _haswedge = true;
-        } else if (hasDriver != _hasdriver)
+        }
+        if (hasDriver != _hasdriver)
         {
             addedClub?.Invoke(driver);
             _hasdriver = true;

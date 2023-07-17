@@ -14,6 +14,7 @@ public class BallPhysics : MonoBehaviour
 
     public float groundDrag;
     public float airDrag;
+    public float maxSpeed;
 
     public static Action<bool, float> ballOffCamera;
     public static Action<Vector2> stopped;
@@ -28,16 +29,23 @@ public class BallPhysics : MonoBehaviour
 
 	void Update()
     {        
+        if (rb.velocity.magnitude > maxSpeed)
+		{
+            rb.velocity = rb.velocity.normalized * maxSpeed;
+		}
+
         RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector2.up, rayLength, layerMask);
         if (hit.collider != null)
 		{
+            isgrounded = true;
             rb.drag = groundDrag;
 		} else
 		{
+            isgrounded = false;
             rb.drag = airDrag;
 		}
 
-        if (rb.velocity.magnitude < .1f)
+        if (rb.velocity.magnitude < .1f && isgrounded)
 		{
             if (!isStopped)
 			{

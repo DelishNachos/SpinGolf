@@ -63,20 +63,21 @@ public class ClubController : MonoBehaviour
         transform.rotation = Quaternion.Euler(0f, 0f, 0f);
         Invoke("TurnOnHit", .2f);
         currentClubSR = clubVisual.gameObject.GetComponent<SpriteRenderer>();
-        
+        currentClubIndex = DataHolder.currentClubIndex;
+        ChangeClubIndex(currentClubIndex);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (DataHolder.hasPutter && (clubs == null || clubs.Count == 0))
+        /*if (DataHolder.hasPutter && (clubs == null || clubs.Count == 0))
 		{
             UpdateClubList(DataHolder.putter);
             currentClubIndex = 0;
             currentClub = clubs[currentClubIndex];
             currentClubSR.sprite = currentClub.clubVisual;
             //changedClub?.Invoke(currentClub.UIVisual, 0);
-        }
+        }*/
 
         if (canMove)
             LookAtMouse();
@@ -194,9 +195,6 @@ public class ClubController : MonoBehaviour
 
     private void ChangeClubIndex(int index)
 	{
-        if (currentClubIndex == index)
-            return;
-
         currentClubIndex = index;
         DataHolder.currentClubIndex = currentClubIndex;
         currentClub = clubs[currentClubIndex];
@@ -243,10 +241,11 @@ public class ClubController : MonoBehaviour
             clubs = new List<ClubObject>();
 		}
 
-        if (clubs.Contains(club))
-            return;
+        Debug.Log("Updated Club List");
 
-        clubs.Add(club);
+        if (!clubs.Contains(club))
+            clubs.Add(club);
+
 	}
 
     private void CanRotateEvent(bool bl)

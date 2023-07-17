@@ -11,6 +11,7 @@ public class UIManager : MonoBehaviour
 
 	public RectTransform clubSpriteHolder;
 	public RectTransform[] clubTransforms;
+	private float[] clubSpriteXLocations;
 
 	public Sprite[] lockedClubSprites;
 	public Sprite[] unlockedClubSprites;
@@ -41,9 +42,13 @@ public class UIManager : MonoBehaviour
 
 	private void Start()
 	{
+		currentIndex = DataHolder.currentClubIndex;
+		clubSpriteXLocations = new float[clubTransforms.Length];
+
 		for (int i = 0; i < clubTransforms.Length; i++)
 		{
 			UpdateClubSprites(i, lockedClubSprites[i]);
+			clubSpriteXLocations[i] = (i * -50) + 50f;
 		}
 
 		if (DataHolder.hasPutter)
@@ -84,8 +89,7 @@ public class UIManager : MonoBehaviour
 
 	private void ChangeClubIcon(int index)
 	{
-		float moveAmount = (index - currentIndex) * -50f;
-		clubSpriteHolder.DOLocalMoveX(clubSpriteHolder.localPosition.x + moveAmount, animationTime);
+		clubSpriteHolder.DOLocalMoveX(clubSpriteXLocations[index], animationTime);
 		clubTransforms[currentIndex].DOScale(1, animationTime);
 		clubTransforms[index].DOScale(2, animationTime);
 		currentIndex = index;

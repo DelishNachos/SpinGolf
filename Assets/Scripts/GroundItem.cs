@@ -20,6 +20,11 @@ public class GroundItem : MonoBehaviour
         transform.DOMoveY(transform.position.y + .5f, 1.5f).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine);
     }
 
+	private void OnDisable()
+	{
+		DOTween.Clear();
+	}
+
 	private void OnTriggerEnter2D(Collider2D collision)
 	{
 		if (collision.tag != "Ball")

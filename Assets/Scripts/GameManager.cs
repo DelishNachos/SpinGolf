@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+	public LevelRules levelRules;
+
 	private void OnEnable()
 	{
 		CheckForEnd.levelComplete += EndLevel;
@@ -15,9 +17,9 @@ public class GameManager : MonoBehaviour
 		CheckForEnd.levelComplete -= EndLevel;
 	}
 
-	private void Awake()
+	private void Start()
 	{
-		//Time.timeScale = .5f;
+		levelRules.LoadRules();
 	}
 
 	private void Update()
