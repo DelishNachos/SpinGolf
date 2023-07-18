@@ -13,6 +13,15 @@ public class AirTunnel : MonoBehaviour
 	private float storedGroundDrag;
 	private float storedAirDrag;
 	private Vector2 storedVeloctity;
+
+	private void Start()
+	{
+		if (!isUp)
+		{
+			windForce = -Mathf.Abs(windForce);
+		}
+	}
+
 	private void OnTriggerEnter2D(Collider2D collision)
 	{
 		if (collision.tag == "Ball")
@@ -20,13 +29,10 @@ public class AirTunnel : MonoBehaviour
 			Debug.Log("BallFound");
 			rb = collision.GetComponent<Rigidbody2D>();
 			BP = collision.GetComponent<BallPhysics>();
+			
 			storedAirDrag = BP.airDrag;
 			storedGroundDrag = BP.groundDrag;
-			storedVeloctity = rb.velocity;
-			if (!isUp)
-			{
-				windForce = -windForce;
-			}
+			storedVeloctity = rb.velocity;		
 			BP.airDrag = 0;
 			BP.groundDrag = 0;
 		}

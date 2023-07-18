@@ -9,5 +9,6 @@ public class ClubObject : ScriptableObject
     public float clubAngle;
     public float clubMaxPower = 1;
     public Sprite clubVisual;
-    public Sprite UIVisual;
+    public int referenceIndex;
+    public Sprite clubSprite;
 }

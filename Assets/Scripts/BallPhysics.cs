@@ -45,7 +45,7 @@ public class BallPhysics : MonoBehaviour
             rb.drag = airDrag;
 		}
 
-        if (rb.velocity.magnitude < .1f && isgrounded)
+        if (rb.velocity.magnitude < .1f && isgrounded && !DataHolder.isInWater && !DataHolder.isInHole)
 		{
             if (!isStopped)
 			{

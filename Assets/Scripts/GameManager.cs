@@ -10,11 +10,13 @@ public class GameManager : MonoBehaviour
 	private void OnEnable()
 	{
 		CheckForEnd.levelComplete += EndLevel;
+		WaterScript.StuckInWater += RestartLevel;
 	}
 
 	private void OnDisable()
 	{
 		CheckForEnd.levelComplete -= EndLevel;
+		WaterScript.StuckInWater -= RestartLevel;
 	}
 
 	private void Start()
@@ -26,8 +28,7 @@ public class GameManager : MonoBehaviour
 	{
 		if (Input.GetKeyDown(KeyCode.R))
 		{
-			Scene scene = SceneManager.GetActiveScene();
-			SceneManager.LoadScene(scene.buildIndex);
+			RestartLevel();
 		}
 
 		if (Input.GetKey(KeyCode.T))
@@ -45,5 +46,12 @@ public class GameManager : MonoBehaviour
 	public void EndLevel()
 	{
         Debug.Log("In Hole");
+	}
+
+	public void RestartLevel()
+	{
+		Scene scene = SceneManager.GetActiveScene();
+		SceneManager.LoadScene(scene.buildIndex);
+		DataHolder.Reset(levelRules);
 	}
 }

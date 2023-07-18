@@ -64,7 +64,7 @@ public class ClubController : MonoBehaviour
         Invoke("TurnOnHit", .2f);
         currentClubSR = clubVisual.gameObject.GetComponent<SpriteRenderer>();
         currentClubIndex = DataHolder.currentClubIndex;
-        ChangeClubIndex(currentClubIndex);
+        StartCoroutine(restartClubChange(currentClubIndex));
     }
 
     // Update is called once per frame
@@ -135,10 +135,7 @@ public class ClubController : MonoBehaviour
                         return;
 					}
                     rb.AddForce(Vector2.ClampMagnitude((Quaternion.Euler(0f, 0f, 90f + currentClub.clubAngle) * rayDirection).normalized * (angularVelocity / forceDamp), currentClub.clubMaxPower), ForceMode2D.Impulse);
-                    Debug.Log(rb.velocity);
-                    /*canMove = false;
-                    float rotZ = Mathf.Atan2(rayDirection.y, rayDirection.x) * Mathf.Rad2Deg;
-                    transform.rotation = Quaternion.Euler(0f, 0f, rotZ + 90);*/
+                    DataHolder.addHit();
                     return;
 				}
 			}
@@ -176,25 +173,61 @@ public class ClubController : MonoBehaviour
     private void ChangeClubForward()
 	{
         int changeIndex = currentClubIndex + 1;
-        if (changeIndex >= clubs.Count)
+        /*if (changeIndex >= clubs.Count)
 		{
             changeIndex = 0;
-		}
+		}*/
+        for (int i = 0; i < clubs.Count - 1; i++)
+        {
+            if (changeIndex >= clubs.Count)
+            {
+                changeIndex = 0;
+            }
+
+            if (clubs[changeIndex] == null)
+            {
+                changeIndex++;
+            }
+            else
+            {
+                break;
+            }
+        }
+        if (changeIndex == currentClubIndex)
+            return;
         ChangeClubIndex(changeIndex);
     }
 
     private void ChangeClubBackward()
 	{
         int changeIndex = currentClubIndex - 1;
-        if (changeIndex < 0)
+        for (int i = 0; i < clubs.Count - 1; i++)
         {
-            changeIndex = clubs.Count - 1;
+            if (changeIndex < 0)
+            {
+                changeIndex = clubs.Count - 1;
+            }
+
+            if (clubs[changeIndex] == null)
+            {
+                changeIndex--;
+            }
+            else
+            {
+                break;
+            }
         }
+        if (changeIndex == currentClubIndex)
+            return;
         ChangeClubIndex(changeIndex);
     }
 
     private void ChangeClubIndex(int index)
 	{
+        
+        if (clubs[index] == null)
+            return;
+        
         currentClubIndex = index;
         DataHolder.currentClubIndex = currentClubIndex;
         currentClub = clubs[currentClubIndex];
@@ -219,7 +252,6 @@ public class ClubController : MonoBehaviour
 
     private void MoveClub(Vector2 ballPos)
 	{
-        Debug.Log("Club Moved");
         canHit = false;
         TweenCallback tweenCallback = null;
         tweenCallback += ResetRotations;
@@ -231,7 +263,6 @@ public class ClubController : MonoBehaviour
 	{
         preRotation = mousePos - transform.position;
         newRotation = preRotation;
-        Debug.Log("Reset Rotations");
 	}
 
     private void UpdateClubList(ClubObject club)
@@ -241,10 +272,23 @@ public class ClubController : MonoBehaviour
             clubs = new List<ClubObject>();
 		}
 
-        Debug.Log("Updated Club List");
+        if (club == null)
+        {
+            clubs.Add(null);
+        } else
+		{
+            if (clubs.Count < 4)
+            {
+                clubs.Add(club);
+            }
+            else
+            {
+                clubs.RemoveAt(club.referenceIndex);
+                clubs.Insert(club.referenceIndex, club);
+			}
+		}
 
-        if (!clubs.Contains(club))
-            clubs.Add(club);
+
 
 	}
 
@@ -259,4 +303,10 @@ public class ClubController : MonoBehaviour
             canHit = false;
 		}
 	}
+
+    private IEnumerator restartClubChange(int currentClubIndex)
+	{
+        yield return new WaitForSeconds(.1f);
+        ChangeClubIndex(currentClubIndex);
+    }
 }

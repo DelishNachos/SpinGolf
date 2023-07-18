@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class UIManager : MonoBehaviour
 
 	public RectTransform clubSpriteHolder;
 	public RectTransform[] clubTransforms;
-	private float[] clubSpriteXLocations;
+	public float[] clubSpriteXLocations;
 
 	public Sprite[] lockedClubSprites;
 	public Sprite[] unlockedClubSprites;
@@ -26,11 +27,14 @@ public class UIManager : MonoBehaviour
 
     private bool showIndicator;
 
+	public TextMeshProUGUI hitCounter;
+
 	private void OnEnable()
 	{
 		BallPhysics.ballOffCamera += ToggleIndicator;
 		ClubController.changedClub += ChangeClubIcon;
 		DataHolder.addedClub += SpriteEventCatcher;
+		DataHolder.hitBall += UpdateHitCounter;
 	}
 
 	private void OnDisable()
@@ -38,30 +42,37 @@ public class UIManager : MonoBehaviour
 		BallPhysics.ballOffCamera -= ToggleIndicator;
 		ClubController.changedClub -= ChangeClubIcon;
 		DataHolder.addedClub -= SpriteEventCatcher;
+		DataHolder.hitBall -= UpdateHitCounter;
 	}
 
 	private void Start()
 	{
 		currentIndex = DataHolder.currentClubIndex;
-		clubSpriteXLocations = new float[clubTransforms.Length];
+		//clubSpriteXLocations = new float[clubTransforms.Length];
 
 		for (int i = 0; i < clubTransforms.Length; i++)
 		{
 			UpdateClubSprites(i, lockedClubSprites[i]);
-			clubSpriteXLocations[i] = (i * -50) + 50f;
+			//clubSpriteXLocations[i] = (i * -50) + 25f;
 		}
+
+		UpdateHitCounter(DataHolder.hits);
 
 		if (DataHolder.hasPutter)
 		{
-			UpdateClubSprites(0, unlockedClubSprites[0]);
+			SpriteEventCatcher(DataHolder.putter);
 		}
 		if (DataHolder.hasWedge)
 		{
-			UpdateClubSprites(1, unlockedClubSprites[1]);
+			SpriteEventCatcher(DataHolder.wedge);
+		}
+		if (DataHolder.hasIron)
+		{
+			SpriteEventCatcher(DataHolder.iron);
 		}
 		if (DataHolder.hasDriver)
 		{
-			UpdateClubSprites(2, unlockedClubSprites[2]);
+			SpriteEventCatcher(DataHolder.driver);
 		}
 	}
 
@@ -102,17 +113,13 @@ public class UIManager : MonoBehaviour
 
 	private void SpriteEventCatcher(ClubObject club)
 	{
-		if (club == DataHolder.putter)
-		{
-			UpdateClubSprites(0, unlockedClubSprites[0]);
-		}
-		else if (club == DataHolder.wedge)
-		{
-			UpdateClubSprites(1, unlockedClubSprites[1]);
-		}
-		else if (club == DataHolder.driver)
-		{
-			UpdateClubSprites(2, unlockedClubSprites[2]);
-		}
+		if (club == null)
+			return;
+		UpdateClubSprites(club.referenceIndex, unlockedClubSprites[club.referenceIndex]);
+	}
+
+	private void UpdateHitCounter(int hits)
+	{
+		hitCounter.text = hits.ToString();
 	}
 }

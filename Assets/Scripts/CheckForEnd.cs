@@ -17,6 +17,7 @@ public class CheckForEnd : MonoBehaviour
 		if (collision.tag == "Ball")
 		{
 			inHole = true;
+			DataHolder.isInHole = true;
 		}
 	}
 
@@ -25,6 +26,7 @@ public class CheckForEnd : MonoBehaviour
 		if (collision.tag == "Ball")
 		{
 			inHole = false;
+			DataHolder.isInHole = false;
 		}
 	}
 
