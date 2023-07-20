@@ -5,12 +5,12 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Level Rules", menuName = "ScriptableObjects/Level Rules")]
 public class LevelRules : ScriptableObject
 {
-    public bool hasPutter;
-    public bool hasWedge;
-    public bool hasIron;
-    public bool hasDriver;
+    public bool hasPutter = true;
+    public bool hasWedge = true;
+    public bool hasIron = true;
+    public bool hasDriver = true;
 
-    public int startingIndex;
+    public int startingIndex = 0;
 
     public void LoadRules()
 	{

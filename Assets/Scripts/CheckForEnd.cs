@@ -12,6 +12,8 @@ public class CheckForEnd : MonoBehaviour
 	private float timeToComplete = 1f;
 	private float currentTime;
 
+	public static Action<bool, GameObject> VisibleEvent;
+
 	public void OnTriggerEnter2D(Collider2D collision)
 	{
 		if (collision.tag == "Ball")
@@ -45,6 +47,28 @@ public class CheckForEnd : MonoBehaviour
 		{
 			currentTime = timeToComplete;
 		}
+
+		Vector2 pos = Camera.main.WorldToViewportPoint(transform.position);
+		/*if ((pos.x <= 1 || pos.x >= 0) && (pos.y <= 1 || pos.y >= 0))
+		{
+			VisibleEvent?.Invoke(true, this.gameObject);
+			Debug.Log("Became Visible");
+		} else
+		{
+			VisibleEvent?.Invoke(false, this.gameObject);
+			Debug.Log("Became Invisible");
+		}*/
+	}
+
+	public void OnBecameVisible()
+	{
+		
+		
+	}
+	public void OnBecameInvisible()
+	{
+		
+		
 	}
 
 	private void CallEvent()

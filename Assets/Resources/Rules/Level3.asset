@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 46c384fc877688241af12f749d4c6cff, type: 3}
-  m_Name: TestLevelRules
+  m_Name: Level3
   m_EditorClassIdentifier: 
   hasPutter: 1
-  hasWedge: 1
-  hasIron: 1
+  hasWedge: 0
+  hasIron: 0
   hasDriver: 1
   startingIndex: 0

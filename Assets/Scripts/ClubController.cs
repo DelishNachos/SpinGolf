@@ -61,7 +61,7 @@ public class ClubController : MonoBehaviour
 	void Start()
     {
         transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-        Invoke("TurnOnHit", .2f);
+        //Invoke("TurnOnHit", .2f);
         currentClubSR = clubVisual.gameObject.GetComponent<SpriteRenderer>();
         currentClubIndex = DataHolder.currentClubIndex;
         StartCoroutine(restartClubChange(currentClubIndex));
@@ -81,6 +81,19 @@ public class ClubController : MonoBehaviour
 
         if (canMove)
             LookAtMouse();
+
+        if (Input.GetMouseButtonDown(0))
+		{
+            ResetRotations();
+		}
+
+        if (Input.GetMouseButton(0))
+		{
+            canHit = true;
+		} else
+		{
+            canHit = false;
+		}
 
         if (Input.GetKeyDown(KeyCode.E)) {
             ChangeClubForward();
@@ -111,16 +124,25 @@ public class ClubController : MonoBehaviour
 
 	private void FixedUpdate()
 	{
+        //Debug.Log("FixedUpdate1");
         if (!canMove)
             return;
 
         if (!canHit)
+		{
+            //preRotation = newRotation;
+            //Debug.Log("!canhit");
             return;
+        }
+
+        //Debug.Log("FixedUpdate2");
 
         newRotation = mousePos - transform.position;
         angle = CalculateAngle();
         angleStep = angle / rayAmount;
         angularVelocity = angle / Time.fixedDeltaTime;
+        /*if (angularVelocity < 1f)
+            return;*/
         for (int i = 0; i < rayAmount; i++)
 		{
             rayDirection = Quaternion.AngleAxis(i * angleStep, transform.forward) * preRotation;
@@ -129,6 +151,9 @@ public class ClubController : MonoBehaviour
 			{
                 if (hit.collider.tag == "Ball")
 				{
+                    BallPhysics BP = hit.collider.GetComponent<BallPhysics>();
+                    if (!BP.canBeHit)
+                        return;
                     Rigidbody2D rb = hit.collider.GetComponent<Rigidbody2D>();
                     if (rb.velocity.magnitude >= .25f)
 					{
@@ -141,7 +166,7 @@ public class ClubController : MonoBehaviour
 			}
         }
         preRotation = newRotation;
-	}
+    }
 
 	void LookAtMouse()
 	{
@@ -159,6 +184,7 @@ public class ClubController : MonoBehaviour
 
     private void TurnOnHit()
 	{
+        Debug.Log("turn on hit");
         ResetRotations();
         canHit = true;
 	}
@@ -179,7 +205,7 @@ public class ClubController : MonoBehaviour
 		}*/
         for (int i = 0; i < clubs.Count - 1; i++)
         {
-            if (changeIndex >= clubs.Count)
+            if (changeIndex >= clubs.Count - 1)
             {
                 changeIndex = 0;
             }
@@ -224,7 +250,7 @@ public class ClubController : MonoBehaviour
 
     private void ChangeClubIndex(int index)
 	{
-        
+        Debug.Log(index);
         if (clubs[index] == null)
             return;
         
@@ -252,15 +278,16 @@ public class ClubController : MonoBehaviour
 
     private void MoveClub(Vector2 ballPos)
 	{
-        canHit = false;
+        //canHit = false;
         TweenCallback tweenCallback = null;
-        tweenCallback += ResetRotations;
-        tweenCallback += TurnOnHit;
+        //tweenCallback += ResetRotations;
+        //tweenCallback += TurnOnHit;
         transform.DOMove(new Vector3(ballPos.x - .3f, ballPos.y + 1.85f, 0f), 1f).OnComplete(tweenCallback);
 	}
 
     private void ResetRotations()
 	{
+        Debug.Log("Reset Rotations");
         preRotation = mousePos - transform.position;
         newRotation = preRotation;
 	}
@@ -295,13 +322,13 @@ public class ClubController : MonoBehaviour
     private void CanRotateEvent(bool bl)
 	{
         canMove = !bl;
-        if (!bl)
+        /*if (!bl)
 		{
             Invoke("TurnOnHit", Time.fixedDeltaTime);
 		} else
 		{
             canHit = false;
-		}
+		}*/
 	}
 
     private IEnumerator restartClubChange(int currentClubIndex)

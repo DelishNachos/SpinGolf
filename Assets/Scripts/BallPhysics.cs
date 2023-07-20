@@ -16,9 +16,10 @@ public class BallPhysics : MonoBehaviour
     public float airDrag;
     public float maxSpeed;
 
-    public static Action<bool, float> ballOffCamera;
+    public static Action<bool, Vector2> ballOffCamera;
     public static Action<Vector2> stopped;
     private bool isStopped = true;
+    public bool canBeHit { get; private set; }
     private bool calledEvent;
 
 	private void Awake()
@@ -45,6 +46,9 @@ public class BallPhysics : MonoBehaviour
             rb.drag = airDrag;
 		}
 
+        canBeHit = true;
+        //canBeHit = rb.velocity.magnitude > 0.05f ? false : true;
+
         if (rb.velocity.magnitude < .1f && isgrounded && !DataHolder.isInWater && !DataHolder.isInHole)
 		{
             if (!isStopped)
@@ -62,11 +66,11 @@ public class BallPhysics : MonoBehaviour
 
         if (transform.position.y > cameraConfider.GetComponent<Collider2D>().bounds.max.y && !calledEvent)
 		{
-            ballOffCamera?.Invoke(true, transform.position.y - cameraConfider.GetComponent<Collider2D>().bounds.max.y);
+            ballOffCamera?.Invoke(true, new Vector2(transform.position.x, transform.position.y - cameraConfider.GetComponent<Collider2D>().bounds.max.y));
             
 		} else
 		{
-            ballOffCamera?.Invoke(false, transform.position.y);
+            ballOffCamera?.Invoke(false, new Vector2(transform.position.x, transform.position.y));
 		}
     }
 }

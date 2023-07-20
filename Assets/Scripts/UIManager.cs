@@ -8,7 +8,13 @@ using TMPro;
 public class UIManager : MonoBehaviour
 {
     public GameObject ballIndicator;
+	public RectTransform indicatorTransform;
     public RectTransform ballTransform;
+	public float YOffset;
+
+	public GameObject flagIndicator;
+	private GameObject flagObject;
+	public float XOffset;
 
 	public RectTransform clubSpriteHolder;
 	public RectTransform[] clubTransforms;
@@ -20,29 +26,33 @@ public class UIManager : MonoBehaviour
 	[SerializeField] private float animationTime;
 
 	private float ballHeight;
+	private float ballX;
 
 
 	[SerializeField] private float minBallSize;
 	[SerializeField] private float maxBallHeight;
 
-    private bool showIndicator;
+    private bool showBallIndicator;
+	private bool showFlagIndicator;
 
 	public TextMeshProUGUI hitCounter;
 
 	private void OnEnable()
 	{
-		BallPhysics.ballOffCamera += ToggleIndicator;
+		BallPhysics.ballOffCamera += ToggleBallIndicator;
 		ClubController.changedClub += ChangeClubIcon;
 		DataHolder.addedClub += SpriteEventCatcher;
 		DataHolder.hitBall += UpdateHitCounter;
+		CheckForEnd.VisibleEvent += ToggleFlagIndicator;
 	}
 
 	private void OnDisable()
 	{
-		BallPhysics.ballOffCamera -= ToggleIndicator;
+		BallPhysics.ballOffCamera -= ToggleBallIndicator;
 		ClubController.changedClub -= ChangeClubIcon;
 		DataHolder.addedClub -= SpriteEventCatcher;
 		DataHolder.hitBall -= UpdateHitCounter;
+		CheckForEnd.VisibleEvent -= ToggleFlagIndicator;
 	}
 
 	private void Start()
@@ -78,24 +88,54 @@ public class UIManager : MonoBehaviour
 
 	private void Update()
 	{
-		ShowIndicator();
+		ShowBallIndicator();
+		ShowFlagIndicator();
 	}
 
-	private void ToggleIndicator(bool isOff, float height)
+	private void ToggleBallIndicator(bool isOff, Vector2 height)
 	{
-		showIndicator = isOff;
-		ballHeight = height;
+		showBallIndicator = isOff;
+		ballHeight = height.y;
+		ballX = height.x;
 
-		ballIndicator.SetActive(showIndicator);
+		ballIndicator.SetActive(showBallIndicator);
 	}
 
-	private void ShowIndicator()
+
+	private void ShowBallIndicator()
 	{
-		if (!showIndicator)
+		if (!showBallIndicator)
 			return;
 
 		float ballSize = ExtensionMethods.Remap(ballHeight, 0, maxBallHeight, .5f, minBallSize);
 		ballTransform.localScale = new Vector3(ballSize, ballSize, ballSize);
+		
+		Vector2 pos = Camera.main.WorldToScreenPoint(new Vector2(ballX, ballHeight));
+		pos.y = Screen.height - YOffset;
+		ballIndicator.transform.position = pos;
+	}
+
+	private void ToggleFlagIndicator(bool TurnOn, GameObject flag)
+	{
+		showFlagIndicator = TurnOn;
+		flagObject = flag;
+
+		flagIndicator.SetActive(TurnOn);
+	}
+	
+	private void ShowFlagIndicator()
+	{
+		if (!showFlagIndicator)
+			return;
+
+		float offset = XOffset;
+		Vector2 pos = Camera.main.WorldToScreenPoint(new Vector2(flagObject.transform.position.x, flagObject.transform.position.y));
+		if (flagObject.transform.position.x > Camera.main.transform.position.x)
+		{
+			offset = -Mathf.Abs(offset);
+		}
+		pos.x = Screen.width + XOffset;
+		flagIndicator.transform.position = pos;
 	}
 
 	private void ChangeClubIcon(int index)

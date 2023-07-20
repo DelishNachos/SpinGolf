@@ -136,4 +136,4 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 51
   angularVelocity: 0
-  forceDamp: 30
+  forceDamp: 75

@@ -19,6 +19,7 @@ public class GroundItem : MonoBehaviour
 	public CLUBTYPE clubType;
 	public Transform spawnLocation;
 	public GameObject spawnObject;
+	public GameObject particles;
 
 	private SpriteRenderer spriteVisual;
 
@@ -62,6 +63,10 @@ public class GroundItem : MonoBehaviour
 		PickUpSpawn(co);
 		pickedUp?.Invoke(co);
 		spriteVisual.enabled = false;
+		if (particles != null)
+		{
+			particles.SetActive(false);
+		}
 	}
 
 	private void PickUpSpawn(ClubObject club)

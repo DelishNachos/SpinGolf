@@ -5,6 +5,7 @@ using UnityEngine;
 public class AirTunnel : MonoBehaviour
 {
 	[SerializeField] private bool isUp;
+	[SerializeField] private float maxSpeed;
 
 	private Rigidbody2D rb;
 	private BallPhysics BP;
@@ -13,6 +14,7 @@ public class AirTunnel : MonoBehaviour
 	private float storedGroundDrag;
 	private float storedAirDrag;
 	private Vector2 storedVeloctity;
+	private float storedMaxSpeed;
 
 	private void Start()
 	{
@@ -32,9 +34,11 @@ public class AirTunnel : MonoBehaviour
 			
 			storedAirDrag = BP.airDrag;
 			storedGroundDrag = BP.groundDrag;
-			storedVeloctity = rb.velocity;		
+			storedVeloctity = rb.velocity;
+			storedMaxSpeed = BP.maxSpeed;
 			BP.airDrag = 0;
 			BP.groundDrag = 0;
+			//BP.maxSpeed = maxSpeed;
 		}
 	}
 
@@ -54,6 +58,7 @@ public class AirTunnel : MonoBehaviour
 		{
 			BP.airDrag = storedAirDrag;
 			BP.groundDrag = storedGroundDrag;
+			//BP.maxSpeed = storedMaxSpeed;
 		}
 	}
 }
