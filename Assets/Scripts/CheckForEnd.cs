@@ -5,7 +5,7 @@ using System;
 
 public class CheckForEnd : MonoBehaviour
 {
-    public static Action levelComplete;
+    public static Action<int> levelComplete;
 	private bool isComplete;
 
 	private bool inHole;
@@ -75,7 +75,7 @@ public class CheckForEnd : MonoBehaviour
 	{
 		if (!isComplete)
 		{
-			levelComplete?.Invoke();
+			levelComplete?.Invoke(DataHolder.hits);
 			isComplete = true;
 		}
 	}

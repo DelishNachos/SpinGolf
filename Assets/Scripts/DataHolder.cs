@@ -28,6 +28,8 @@ public static class DataHolder
     public static bool isInWater = false;
     public static bool isInHole = false;
 
+    public static bool isPaused;
+
     public static void InitClubs()
 	{
         if (hasPutter != _hasputter)
@@ -84,6 +86,7 @@ public static class DataHolder
         currentClubIndex = LR.startingIndex;
         isInWater = false;
         isInHole = false;
+        isPaused = false;
         hits = 0;
 	}
 

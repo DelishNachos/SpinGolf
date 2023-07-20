@@ -48,6 +48,7 @@ public class ClubController : MonoBehaviour
         BallPhysics.stopped += MoveClub;
         DataHolder.addedClub += UpdateClubList;
         CameraControls.movingEvent += CanRotateEvent;
+        CheckForEnd.levelComplete += TurnOffControls;
 	}
 
 	private void OnDisable()
@@ -55,6 +56,7 @@ public class ClubController : MonoBehaviour
         BallPhysics.stopped -= MoveClub;
         DataHolder.addedClub -= UpdateClubList;
         CameraControls.movingEvent -= CanRotateEvent;
+        CheckForEnd.levelComplete -= TurnOffControls;
     }
 
 	// Start is called before the first frame update
@@ -78,6 +80,9 @@ public class ClubController : MonoBehaviour
             currentClubSR.sprite = currentClub.clubVisual;
             //changedClub?.Invoke(currentClub.UIVisual, 0);
         }*/
+        if (DataHolder.isPaused)
+            return;
+
 
         if (canMove)
             LookAtMouse();
@@ -124,6 +129,9 @@ public class ClubController : MonoBehaviour
 
 	private void FixedUpdate()
 	{
+        if (DataHolder.isPaused)
+            return;
+
         //Debug.Log("FixedUpdate1");
         if (!canMove)
             return;
@@ -160,6 +168,7 @@ public class ClubController : MonoBehaviour
                         return;
 					}
                     rb.AddForce(Vector2.ClampMagnitude((Quaternion.Euler(0f, 0f, 90f + currentClub.clubAngle) * rayDirection).normalized * (angularVelocity / forceDamp), currentClub.clubMaxPower), ForceMode2D.Impulse);
+                    Debug.Log("Hit Power: " + rb.velocity.magnitude);
                     DataHolder.addHit();
                     return;
 				}
@@ -184,7 +193,6 @@ public class ClubController : MonoBehaviour
 
     private void TurnOnHit()
 	{
-        Debug.Log("turn on hit");
         ResetRotations();
         canHit = true;
 	}
@@ -205,7 +213,7 @@ public class ClubController : MonoBehaviour
 		}*/
         for (int i = 0; i < clubs.Count - 1; i++)
         {
-            if (changeIndex >= clubs.Count - 1)
+            if (changeIndex >= clubs.Count)
             {
                 changeIndex = 0;
             }
@@ -250,7 +258,6 @@ public class ClubController : MonoBehaviour
 
     private void ChangeClubIndex(int index)
 	{
-        Debug.Log(index);
         if (clubs[index] == null)
             return;
         
@@ -287,7 +294,6 @@ public class ClubController : MonoBehaviour
 
     private void ResetRotations()
 	{
-        Debug.Log("Reset Rotations");
         preRotation = mousePos - transform.position;
         newRotation = preRotation;
 	}
@@ -336,4 +342,10 @@ public class ClubController : MonoBehaviour
         yield return new WaitForSeconds(.1f);
         ChangeClubIndex(currentClubIndex);
     }
+
+    private void TurnOffControls(int hits)
+	{
+        canHit = false;
+        canMove = false;
+	}
 }

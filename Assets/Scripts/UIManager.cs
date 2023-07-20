@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using TMPro;
+using System;
 
 public class UIManager : MonoBehaviour
 {
@@ -37,6 +38,12 @@ public class UIManager : MonoBehaviour
 
 	public TextMeshProUGUI hitCounter;
 
+	public GameObject pauseMenu;
+
+	public GameObject endMenu;
+	public TextMeshProUGUI hitsText;
+	public static Action<int> pressedButton;
+
 	private void OnEnable()
 	{
 		BallPhysics.ballOffCamera += ToggleBallIndicator;
@@ -44,6 +51,8 @@ public class UIManager : MonoBehaviour
 		DataHolder.addedClub += SpriteEventCatcher;
 		DataHolder.hitBall += UpdateHitCounter;
 		CheckForEnd.VisibleEvent += ToggleFlagIndicator;
+		CheckForEnd.levelComplete += EnableEndScreen;
+		GameManager.pausedGame += TogglePauseMenu;
 	}
 
 	private void OnDisable()
@@ -53,6 +62,8 @@ public class UIManager : MonoBehaviour
 		DataHolder.addedClub -= SpriteEventCatcher;
 		DataHolder.hitBall -= UpdateHitCounter;
 		CheckForEnd.VisibleEvent -= ToggleFlagIndicator;
+		CheckForEnd.levelComplete -= EnableEndScreen;
+		GameManager.pausedGame -= TogglePauseMenu;
 	}
 
 	private void Start()
@@ -161,5 +172,27 @@ public class UIManager : MonoBehaviour
 	private void UpdateHitCounter(int hits)
 	{
 		hitCounter.text = hits.ToString();
+	}
+
+	private void TogglePauseMenu(bool pause)
+	{
+		if (pause)
+		{
+			pauseMenu.SetActive(true);
+		} else
+		{
+			pauseMenu.SetActive(false);
+		}
+	}
+
+	private void EnableEndScreen(int hits)
+	{
+		endMenu.SetActive(true);
+		hitsText.text = "Hits:" + hits.ToString();
+	}
+
+	public void ButtonPressed(int buttonIndex)
+	{
+		pressedButton?.Invoke(buttonIndex);
 	}
 }

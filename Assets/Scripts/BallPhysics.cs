@@ -29,7 +29,9 @@ public class BallPhysics : MonoBehaviour
 	}
 
 	void Update()
-    {        
+    {
+        //Debug.Log(rb.velocity.magnitude);
+
         if (rb.velocity.magnitude > maxSpeed)
 		{
             rb.velocity = rb.velocity.normalized * maxSpeed;
