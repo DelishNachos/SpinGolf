@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using CI.QuickSave;
 
 public static class DataHolder
 {
@@ -29,6 +30,8 @@ public static class DataHolder
     public static bool isInHole = false;
 
     public static bool isPaused;
+
+    public static int[] highScores;
 
     public static void InitClubs()
 	{
@@ -124,4 +127,31 @@ public static class DataHolder
             _hasdriver = true;
         }
     }
+
+    public static bool SaveData(int score, int level)
+	{
+        bool isHigh = false;
+        QuickSaveReader quickSaveReader = QuickSaveReader.Create("Scores");
+        IEnumerable<string> keys = quickSaveReader.GetAllKeys();
+        QuickSaveWriter quickSaveWriter = QuickSaveWriter.Create("Scores");
+        int counter = 8;
+        foreach (string key in keys)
+		{
+            int highScore = quickSaveReader.Read<int>(key);
+            if (counter == level - 1)
+			{
+                if (score < highScore)
+				{
+                    highScore = score;
+                    isHigh = true;
+				}
+			}
+            quickSaveWriter.Write(key, highScore);
+            quickSaveWriter.Commit();
+            if (highScores != null)
+                highScores[counter] = highScore;
+            counter--;
+        }
+        return isHigh; 
+	}
 }

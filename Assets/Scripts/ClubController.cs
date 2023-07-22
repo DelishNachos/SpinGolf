@@ -168,7 +168,6 @@ public class ClubController : MonoBehaviour
                         return;
 					}
                     rb.AddForce(Vector2.ClampMagnitude((Quaternion.Euler(0f, 0f, 90f + currentClub.clubAngle) * rayDirection).normalized * (angularVelocity / forceDamp), currentClub.clubMaxPower), ForceMode2D.Impulse);
-                    Debug.Log("Hit Power: " + rb.velocity.magnitude);
                     DataHolder.addHit();
                     return;
 				}

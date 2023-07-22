@@ -3,18 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
+using DG.Tweening;
 
 public class GameManager : MonoBehaviour
 {
 	public LevelRules levelRules;
 	public static Action<bool> pausedGame;
+	public static Action isHighScore;
 	private bool isPaused;
+
+	public int[] scores;
 
 	private void OnEnable()
 	{
 		CheckForEnd.levelComplete += EndLevel;
 		WaterScript.StuckInWater += RestartLevel;
 		UIManager.pressedButton += DetermineButtonAction;
+		BallPhysics.ballOffCameraX += RestartLevel;
 	}
 
 	private void OnDisable()
@@ -22,11 +27,13 @@ public class GameManager : MonoBehaviour
 		CheckForEnd.levelComplete -= EndLevel;
 		WaterScript.StuckInWater -= RestartLevel;
 		UIManager.pressedButton -= DetermineButtonAction;
+		BallPhysics.ballOffCameraX -= RestartLevel;
 	}
 
 	private void Start()
 	{
 		levelRules.LoadRules();
+		scores = DataHolder.highScores;
 	}
 
 	private void Update()
@@ -62,7 +69,9 @@ public class GameManager : MonoBehaviour
 
 	public void EndLevel(int hits)
 	{
-        Debug.Log("In Hole");
+		bool isHigh = DataHolder.SaveData(hits, SceneManager.GetActiveScene().buildIndex);
+		if (isHigh)
+			isHighScore?.Invoke();
 	}
 
 	private void DetermineButtonAction(int index)
@@ -92,6 +101,7 @@ public class GameManager : MonoBehaviour
 		Scene scene = SceneManager.GetActiveScene();
 		SceneManager.LoadScene(scene.buildIndex);
 		DataHolder.Reset(levelRules);
+		DOTween.CompleteAll();
 	}
 
 	private void NextLevel()
@@ -99,6 +109,7 @@ public class GameManager : MonoBehaviour
 		Scene scene = SceneManager.GetActiveScene();
 		SceneManager.LoadScene(scene.buildIndex + 1);
 		DataHolder.Reset(levelRules);
+		DOTween.CompleteAll();
 	}
 
 	private void ReturnToMenu()

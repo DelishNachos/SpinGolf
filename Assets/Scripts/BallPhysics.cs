@@ -16,7 +16,11 @@ public class BallPhysics : MonoBehaviour
     public float airDrag;
     public float maxSpeed;
 
-    public static Action<bool, Vector2> ballOffCamera;
+    public static Action<bool, Vector2> ballOffCameraY;
+    public static Action ballOffCameraX;
+    private bool offCameraX;
+    private float currentTime;
+    private float timeToComplete = 1f;
     public static Action<Vector2> stopped;
     private bool isStopped = true;
     public bool canBeHit { get; private set; }
@@ -68,11 +72,40 @@ public class BallPhysics : MonoBehaviour
 
         if (transform.position.y > cameraConfider.GetComponent<Collider2D>().bounds.max.y && !calledEvent)
 		{
-            ballOffCamera?.Invoke(true, new Vector2(transform.position.x, transform.position.y - cameraConfider.GetComponent<Collider2D>().bounds.max.y));
+            ballOffCameraY?.Invoke(true, new Vector2(transform.position.x, transform.position.y - cameraConfider.GetComponent<Collider2D>().bounds.max.y));
             
 		} else
 		{
-            ballOffCamera?.Invoke(false, new Vector2(transform.position.x, transform.position.y));
+            ballOffCameraY?.Invoke(false, new Vector2(transform.position.x, transform.position.y));
 		}
+
+        if (transform.position.x > cameraConfider.GetComponent<Collider2D>().bounds.max.x || transform.position.x < cameraConfider.GetComponent<Collider2D>().bounds.min.x)
+		{
+            offCameraX = true;
+		} else
+		{
+            offCameraX = false;
+		}
+
+        if (offCameraX)
+        {
+            if (currentTime > 0f)
+            {
+                currentTime -= Time.deltaTime;
+            }
+            else
+            {
+                CallEvent();
+            }
+        }
+        else
+        {
+            currentTime = timeToComplete;
+        }
     }
+
+    private void CallEvent()
+	{
+        ballOffCameraX?.Invoke();
+	}
 }

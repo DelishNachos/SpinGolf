@@ -41,28 +41,31 @@ public class UIManager : MonoBehaviour
 	public GameObject pauseMenu;
 
 	public GameObject endMenu;
+	public GameObject highScore;
 	public TextMeshProUGUI hitsText;
 	public static Action<int> pressedButton;
 
 	private void OnEnable()
 	{
-		BallPhysics.ballOffCamera += ToggleBallIndicator;
+		BallPhysics.ballOffCameraY += ToggleBallIndicator;
 		ClubController.changedClub += ChangeClubIcon;
 		DataHolder.addedClub += SpriteEventCatcher;
 		DataHolder.hitBall += UpdateHitCounter;
 		CheckForEnd.VisibleEvent += ToggleFlagIndicator;
 		CheckForEnd.levelComplete += EnableEndScreen;
+		GameManager.isHighScore += EnableHighScoreScreen;
 		GameManager.pausedGame += TogglePauseMenu;
 	}
 
 	private void OnDisable()
 	{
-		BallPhysics.ballOffCamera -= ToggleBallIndicator;
+		BallPhysics.ballOffCameraY -= ToggleBallIndicator;
 		ClubController.changedClub -= ChangeClubIcon;
 		DataHolder.addedClub -= SpriteEventCatcher;
 		DataHolder.hitBall -= UpdateHitCounter;
 		CheckForEnd.VisibleEvent -= ToggleFlagIndicator;
 		CheckForEnd.levelComplete -= EnableEndScreen;
+		GameManager.isHighScore -= EnableHighScoreScreen;
 		GameManager.pausedGame -= TogglePauseMenu;
 	}
 
@@ -179,9 +182,10 @@ public class UIManager : MonoBehaviour
 		if (pause)
 		{
 			pauseMenu.SetActive(true);
+			pauseMenu.transform.GetChild(0).transform.DOScale(Vector3.one, .2f).SetEase(Ease.OutBounce);
 		} else
 		{
-			pauseMenu.SetActive(false);
+			pauseMenu.transform.GetChild(0).transform.DOScale(Vector3.one * .2f, .1f).OnComplete(() => pauseMenu.SetActive(false));
 		}
 	}
 
@@ -189,6 +193,12 @@ public class UIManager : MonoBehaviour
 	{
 		endMenu.SetActive(true);
 		hitsText.text = "Hits:" + hits.ToString();
+		endMenu.transform.GetChild(0).transform.DOScale(Vector3.one , .2f).SetEase(Ease.OutBounce);
+	}
+
+	private void EnableHighScoreScreen()
+	{
+		highScore.SetActive(true);
 	}
 
 	public void ButtonPressed(int buttonIndex)
