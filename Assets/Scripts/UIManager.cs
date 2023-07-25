@@ -45,6 +45,18 @@ public class UIManager : MonoBehaviour
 	public TextMeshProUGUI hitsText;
 	public static Action<int> pressedButton;
 
+
+	public GameObject settingsMenu;
+	public Slider masterVolume;
+	public Slider musicVolume;
+	public Slider effectsVolume;
+	public GameObject masterSlash;
+	public GameObject musicSlash;
+	public GameObject effectsSlash;
+	private float storedMaster;
+	private float storedMusic;
+	private float storedEffects;
+
 	private void OnEnable()
 	{
 		BallPhysics.ballOffCameraY += ToggleBallIndicator;
@@ -98,12 +110,40 @@ public class UIManager : MonoBehaviour
 		{
 			SpriteEventCatcher(DataHolder.driver);
 		}
+
+		masterVolume.onValueChanged.AddListener(val => SoundEffectsManager.Instance.ChangeMasterVolume(val));
+		musicVolume.onValueChanged.AddListener(val => SoundEffectsManager.Instance.ChangeMusicVolume(val));
+		effectsVolume.onValueChanged.AddListener(val => SoundEffectsManager.Instance.ChangeEffectsVolume(val));
+		masterVolume.value = DataHolder.masterVolume;
+		musicVolume.value = DataHolder.musicVolume;
+		effectsVolume.value = DataHolder.effectsVolume;
+		SoundEffectsManager.Instance.ChangeMasterVolume(masterVolume.value);
+		SoundEffectsManager.Instance.ChangeMusicVolume(musicVolume.value);
+		SoundEffectsManager.Instance.ChangeEffectsVolume(effectsVolume.value);
+
+		if (DataHolder.masterMute)
+		{
+			//ToggleMasterVolume();
+			masterSlash.SetActive(true);
+		}
+		if (DataHolder.musicMute)
+		{
+			//ToggleMusicVolume();
+			musicSlash.SetActive(true);
+		}
+		if (DataHolder.effectsMute)
+		{
+			//ToggleEffectsVolume();
+			effectsSlash.SetActive(true);
+		}
 	}
 
 	private void Update()
 	{
 		ShowBallIndicator();
 		ShowFlagIndicator();
+
+		
 	}
 
 	private void ToggleBallIndicator(bool isOff, Vector2 height)
@@ -204,5 +244,66 @@ public class UIManager : MonoBehaviour
 	public void ButtonPressed(int buttonIndex)
 	{
 		pressedButton?.Invoke(buttonIndex);
+	}
+
+	public void ToggleSettingsMenu(bool toggle)
+	{
+		if (toggle)
+		{
+			settingsMenu.SetActive(true);
+			endMenu.SetActive(false);
+			settingsMenu.transform.GetChild(0).transform.DOScale(Vector3.one, .2f).SetEase(Ease.OutBounce);
+		} else
+		{
+			settingsMenu.SetActive(false);
+			endMenu.SetActive(true);
+		}
+	}
+
+	public void ToggleMasterVolume()
+	{
+		SoundEffectsManager.Instance.ToggleMasterVolume();
+		if (DataHolder.masterMute)
+		{
+			//storedMaster = SoundEffectsManager.Instance.MasterVolume;
+			masterVolume.value = 0;
+			masterSlash.SetActive(true);
+		} else
+		{
+			masterVolume.value = DataHolder.storedMasterVolume;
+			masterSlash.SetActive(false);
+		}
+	}
+
+	public void ToggleMusicVolume()
+	{
+		SoundEffectsManager.Instance.ToggleMusicVolume();
+		if (SimpleAudioManager.Manager.instance.IsMuted())
+		{
+			//storedMusic = SoundEffectsManager.Instance.MusicVolume;
+			musicVolume.value = 0;
+			musicSlash.SetActive(true);
+		}
+		else
+		{
+			musicVolume.value = DataHolder.storedMusicVolume;
+			musicSlash.SetActive(false);
+		}
+	}
+
+	public void ToggleEffectsVolume()
+	{
+		SoundEffectsManager.Instance.ToggleEffectsVolume();		
+		if (SoundEffectsManager.Instance.EffectsIsMuted())
+		{
+			//storedEffects = SoundEffectsManager.Instance.EffectsVolume;
+			effectsVolume.value = 0;
+			effectsSlash.SetActive(true);
+		}
+		else
+		{
+			effectsVolume.value = DataHolder.storedEffectsVolume;
+			effectsSlash.SetActive(false);
+		}
 	}
 }

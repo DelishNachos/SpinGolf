@@ -7,9 +7,10 @@ public class GameInitiation : MonoBehaviour
 {
     public int[] scores;
     public bool resetSave;
+    public bool resetVolume;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         try
 		{
@@ -27,6 +28,24 @@ public class GameInitiation : MonoBehaviour
 		{
             PreLoadScores();
             LoadScores();
+		}
+
+        try
+		{
+            QuickSaveReader quickSaveReader = QuickSaveReader.Create("Volume");
+
+            if (resetVolume)
+			{
+                QuickSaveWriter quickSaveWriter = QuickSaveWriter.Create("Volume");
+                quickSaveWriter.Delete("Volume");
+                PreLoadVolume();
+			}
+
+            LoadVolume();
+		} catch (QuickSaveException e)
+		{
+            PreLoadVolume();
+            LoadVolume();
 		}
     }
 
@@ -56,5 +75,35 @@ public class GameInitiation : MonoBehaviour
             counter--;
 		}
         DataHolder.highScores = scores;
+	}
+
+    private void PreLoadVolume()
+	{
+        QuickSaveWriter.Create("Volume")
+            .Write("MasterVolume", .5f)
+            .Write("MusicVolume", 1f)
+            .Write("EffectsVolume", 1f)
+            .Write("StoredMasterVolume", .5f)
+            .Write("StoredMusicVolume", 1f)
+            .Write("StoredEffectsVolume", 1f)
+            .Write("MasterMute", false)
+            .Write("MusicMute", false)
+            .Write("EffectsMute", false)
+            .Commit();
+
+    }
+
+    private void LoadVolume()
+	{
+        QuickSaveReader quickSaveReader = QuickSaveReader.Create("Volume");
+        DataHolder.masterVolume = quickSaveReader.Read<float>("MasterVolume");
+        DataHolder.musicVolume = quickSaveReader.Read<float>("MusicVolume");
+        DataHolder.effectsVolume = quickSaveReader.Read<float>("EffectsVolume");
+        DataHolder.storedMasterVolume = quickSaveReader.Read<float>("StoredMasterVolume");
+        DataHolder.storedMusicVolume = quickSaveReader.Read<float>("StoredMusicVolume");
+        DataHolder.storedEffectsVolume = quickSaveReader.Read<float>("StoredEffectsVolume");
+        DataHolder.masterMute = quickSaveReader.Read<bool>("MasterMute");
+        DataHolder.musicMute = quickSaveReader.Read<bool>("MusicMute");
+        DataHolder.effectsMute = quickSaveReader.Read<bool>("EffectsMute");
 	}
 }

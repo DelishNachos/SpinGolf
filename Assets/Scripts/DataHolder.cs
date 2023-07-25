@@ -33,6 +33,12 @@ public static class DataHolder
 
     public static int[] highScores;
 
+    public static float masterVolume = .5f;
+    public static float musicVolume = 1f;
+    public static float effectsVolume = 1f;
+    public static float storedMasterVolume = -1f, storedMusicVolume = -1f, storedEffectsVolume = -1f;
+    public static bool masterMute, musicMute, effectsMute;
+
     public static void InitClubs()
 	{
         if (hasPutter != _hasputter)
@@ -154,4 +160,19 @@ public static class DataHolder
         }
         return isHigh; 
 	}
+
+    public static void SaveVolumeData()
+	{
+        QuickSaveWriter.Create("Volume")
+            .Write("MasterVolume", masterVolume)
+            .Write("MusicVolume", musicVolume)
+            .Write("EffectsVolume", effectsVolume)
+            .Write("StoredMasterVolume", storedMasterVolume)
+            .Write("StoredMusicVolume", storedMusicVolume)
+            .Write("StoredEffectsVolume", storedEffectsVolume)
+            .Write("MasterMute", masterMute)
+            .Write("MusicMute", musicMute)
+            .Write("EffectsMute", effectsMute)
+            .Commit();
+    }
 }
