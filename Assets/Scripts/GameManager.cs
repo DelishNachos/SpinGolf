@@ -9,8 +9,10 @@ public class GameManager : MonoBehaviour
 {
 	public LevelRules levelRules;
 	public static Action<bool> pausedGame;
+	public static Action<bool> openedSettings;
 	public static Action isHighScore;
 	private bool isPaused;
+	private bool inSettings;
 
 	public int[] scores;
 
@@ -20,6 +22,7 @@ public class GameManager : MonoBehaviour
 		WaterScript.StuckInWater += RestartLevel;
 		UIManager.pressedButton += DetermineButtonAction;
 		BallPhysics.ballOffCameraX += RestartLevel;
+		UIManager.inSettings += toggleSettingsBool;
 	}
 
 	private void OnDisable()
@@ -28,6 +31,7 @@ public class GameManager : MonoBehaviour
 		WaterScript.StuckInWater -= RestartLevel;
 		UIManager.pressedButton -= DetermineButtonAction;
 		BallPhysics.ballOffCameraX -= RestartLevel;
+		UIManager.inSettings -= toggleSettingsBool;
 	}
 
 	private void Start()
@@ -58,12 +62,20 @@ public class GameManager : MonoBehaviour
 		{
 			if (!isPaused)
 			{
-				PauseGame();				
+				PauseGame();
+				isPaused = !isPaused;
 			} else
 			{
-				UnpauseGame();
+				if (inSettings)
+				{
+					openedSettings?.Invoke(false);
+				} else
+				{
+					UnpauseGame();
+					isPaused = !isPaused;
+				}
 			}
-			isPaused = !isPaused;
+			
 		}
 	}
 
@@ -130,5 +142,10 @@ public class GameManager : MonoBehaviour
 		Time.timeScale = 1;
 		DataHolder.isPaused = false;
 		pausedGame?.Invoke(false);
+	}
+
+	private void toggleSettingsBool(bool toggle)
+	{
+		inSettings = toggle;
 	}
 }

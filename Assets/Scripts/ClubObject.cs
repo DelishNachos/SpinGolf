@@ -11,4 +11,5 @@ public class ClubObject : ScriptableObject
     public Sprite clubVisual;
     public int referenceIndex;
     public Sprite clubSprite;
+    public AudioClip clip;
 }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TestLevelRules
   m_EditorClassIdentifier: 
   hasPutter: 1
-  hasWedge: 0
-  hasIron: 0
+  hasWedge: 1
+  hasIron: 1
   hasDriver: 1
   startingIndex: 0

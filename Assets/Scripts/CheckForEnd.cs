@@ -12,6 +12,8 @@ public class CheckForEnd : MonoBehaviour
 	private float timeToComplete = 1f;
 	private float currentTime;
 
+	public AudioClip inHoleSound;
+
 	public static Action<bool, GameObject> VisibleEvent;
 
 	public void OnTriggerEnter2D(Collider2D collision)
@@ -20,6 +22,7 @@ public class CheckForEnd : MonoBehaviour
 		{
 			inHole = true;
 			DataHolder.isInHole = true;
+			SoundEffectsManager.Instance.PlayEffectAudio(inHoleSound);
 		}
 	}
 
@@ -29,6 +32,7 @@ public class CheckForEnd : MonoBehaviour
 		{
 			inHole = false;
 			DataHolder.isInHole = false;
+			SoundEffectsManager.Instance.StopEffectAudio();
 		}
 	}
 

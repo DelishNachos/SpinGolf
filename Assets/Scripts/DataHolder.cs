@@ -146,7 +146,7 @@ public static class DataHolder
             int highScore = quickSaveReader.Read<int>(key);
             if (counter == level - 1)
 			{
-                if (score < highScore)
+                if (score < highScore || highScore == -1)
 				{
                     highScore = score;
                     isHigh = true;

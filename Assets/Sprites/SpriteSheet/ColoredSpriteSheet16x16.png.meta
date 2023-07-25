@@ -2883,6 +2883,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: ColoredSpriteSheet16x16_123
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1a2db6c3b0f2ebc40a7380ca8e5eff25
+      internalID: -2091875170
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -2922,6 +2943,7 @@ TextureImporter:
       ColoredSpriteSheet16x16_120: 559921982
       ColoredSpriteSheet16x16_121: -2003121626
       ColoredSpriteSheet16x16_122: 685091291
+      ColoredSpriteSheet16x16_123: -2091875170
       ColoredSpriteSheet16x16_13: 1692510747
       ColoredSpriteSheet16x16_14: -791845617
       ColoredSpriteSheet16x16_15: -1978921374

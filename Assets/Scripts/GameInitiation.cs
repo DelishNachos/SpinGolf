@@ -5,13 +5,15 @@ using CI.QuickSave;
 
 public class GameInitiation : MonoBehaviour
 {
-    public int[] scores;
+    private int[] scores;
+    public Texture2D cursor;
     public bool resetSave;
     public bool resetVolume;
 
     // Start is called before the first frame update
     void Awake()
     {
+        scores = new int[9];
         try
 		{
             QuickSaveReader quickSaverReader = QuickSaveReader.Create("Scores");
@@ -49,18 +51,24 @@ public class GameInitiation : MonoBehaviour
 		}
     }
 
+    void Start()
+	{
+        Cursor.SetCursor(cursor, new Vector2(cursor.width / 2, cursor.height / 2), CursorMode.Auto);
+        Cursor.lockState = CursorLockMode.Confined;
+	}
+
     private void PreLoadScores()
 	{
         QuickSaveWriter.Create("Scores")
-            .Write("Level1", 99)
-            .Write("Level2", 99)
-            .Write("Level3", 99)
-            .Write("Level4", 99)
-            .Write("Level5", 99)
-            .Write("Level6", 99)
-            .Write("Level7", 99)
-            .Write("Level8", 99)
-            .Write("Level9", 99)
+            .Write("Level1", -1)
+            .Write("Level2", -1)
+            .Write("Level3", -1)
+            .Write("Level4", -1)
+            .Write("Level5", -1)
+            .Write("Level6", -1)
+            .Write("Level7", -1)
+            .Write("Level8", -1)
+            .Write("Level9", -1)
             .Commit();
     }
 

@@ -4978,7 +4978,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78811523ac80bbe4f8b01042756d4537, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scores: 000000000000000000000000000000000000000000000000000000000000000000000000
+  cursor: {fileID: 2800000, guid: e3ccad7599250b54f8a5834b39729ad0, type: 3}
   resetSave: 0
   resetVolume: 0
 --- !u!4 &1672037867

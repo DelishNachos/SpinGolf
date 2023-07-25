@@ -26,8 +26,8 @@ public class SoundEffectsManager : MonoBehaviour
 	public float EffectsVolume => _effectsVolume;
 	private float _masterVolume, _musicVolume, _effectsVolume;
 	[SerializeField] private AudioSource effectsSource;
+	[SerializeField] private AudioSource specialEffectsSource;
 	private bool masterMuted;
-	private float storedMasterVolume;
 
 	private void Start()
 	{
@@ -42,6 +42,22 @@ public class SoundEffectsManager : MonoBehaviour
 	public void PlayEffectAudio(AudioClip clip)
 	{
 		effectsSource.PlayOneShot(clip);
+	}
+
+	public void StopEffectAudio()
+	{
+		effectsSource.Stop();
+	}
+
+	public void PlaySpecialEffectAudio(AudioClip clip, float volume)
+	{
+		specialEffectsSource.volume = ExtensionMethods.Remap(volume, 0, 1, 0, _effectsVolume);
+		specialEffectsSource.PlayOneShot(clip);
+	}
+
+	public void StopSpecialEffectAudio()
+	{
+		specialEffectsSource.Stop();
 	}
 
 	public void ChangeMasterVolume(float volume)
@@ -104,12 +120,14 @@ public class SoundEffectsManager : MonoBehaviour
 		{
 			effectsSource.volume = DataHolder.storedEffectsVolume;
 			effectsSource.mute = false;
+			specialEffectsSource.mute = false;
 			DataHolder.effectsMute = false;
 			DataHolder.effectsVolume = DataHolder.storedEffectsVolume;
 		} else
 		{
 			DataHolder.storedEffectsVolume = effectsSource.volume;
 			effectsSource.mute = true;
+			specialEffectsSource.mute = true;
 			DataHolder.effectsMute = true;
 			DataHolder.effectsVolume = 0;
 		}

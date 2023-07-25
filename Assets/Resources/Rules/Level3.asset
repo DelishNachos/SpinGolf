@@ -15,5 +15,5 @@ MonoBehaviour:
   hasPutter: 1
   hasWedge: 0
   hasIron: 0
-  hasDriver: 1
+  hasDriver: 0
   startingIndex: 0

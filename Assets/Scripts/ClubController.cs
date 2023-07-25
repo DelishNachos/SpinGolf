@@ -167,7 +167,10 @@ public class ClubController : MonoBehaviour
 					{
                         return;
 					}
-                    rb.AddForce(Vector2.ClampMagnitude((Quaternion.Euler(0f, 0f, 90f + currentClub.clubAngle) * rayDirection).normalized * (angularVelocity / forceDamp), currentClub.clubMaxPower), ForceMode2D.Impulse);
+                    Vector2 force = Vector2.ClampMagnitude((Quaternion.Euler(0f, 0f, 90f + currentClub.clubAngle) * rayDirection).normalized * (angularVelocity / forceDamp), currentClub.clubMaxPower);
+                    rb.AddForce(force, ForceMode2D.Impulse);
+                    float forceMag = force.magnitude;
+                    SoundEffectsManager.Instance.PlaySpecialEffectAudio(currentClub.clip, ExtensionMethods.Remap(forceMag, 0, 50f, 0, 1));
                     DataHolder.addHit();
                     return;
 				}

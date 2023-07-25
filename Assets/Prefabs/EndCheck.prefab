@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf499c085bf575c4597df15d3170d81b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inHoleSound: {fileID: 8300000, guid: 31cad6a1e4bf6324c828bc291f109100, type: 3}
 --- !u!61 &3298530107001607432
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -22,7 +22,13 @@ public class LevelSelect : MonoBehaviour
 		{
             for(int i = 0; i < highScores.Length; i++ )
 		    {
-                highScores[i].text = "Hits:" + DataHolder.highScores[i].ToString();
+                if (DataHolder.highScores[i] == -1)
+				{
+                    highScores[i].text = "Hits:-";
+				} else
+				{
+					highScores[i].text = "Hits:" + DataHolder.highScores[i].ToString();
+				}
 		    }
 		}
     }

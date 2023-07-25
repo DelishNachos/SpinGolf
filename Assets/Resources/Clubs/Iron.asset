@@ -18,3 +18,4 @@ MonoBehaviour:
   clubVisual: {fileID: -2076476558, guid: 7061e7a2955a00442910a1a02679ab17, type: 3}
   referenceIndex: 2
   clubSprite: {fileID: -362549404, guid: 4caf711685ec67a4988950e2fa85b6ef, type: 3}
+  clip: {fileID: 8300000, guid: a481759933a64b8479872fa20359584b, type: 3}

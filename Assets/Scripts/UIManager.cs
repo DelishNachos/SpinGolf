@@ -56,6 +56,7 @@ public class UIManager : MonoBehaviour
 	private float storedMaster;
 	private float storedMusic;
 	private float storedEffects;
+	public static Action<bool> inSettings;
 
 	private void OnEnable()
 	{
@@ -67,6 +68,7 @@ public class UIManager : MonoBehaviour
 		CheckForEnd.levelComplete += EnableEndScreen;
 		GameManager.isHighScore += EnableHighScoreScreen;
 		GameManager.pausedGame += TogglePauseMenu;
+		GameManager.openedSettings += ToggleSettingsMenu;
 	}
 
 	private void OnDisable()
@@ -79,6 +81,7 @@ public class UIManager : MonoBehaviour
 		CheckForEnd.levelComplete -= EnableEndScreen;
 		GameManager.isHighScore -= EnableHighScoreScreen;
 		GameManager.pausedGame -= TogglePauseMenu;
+		GameManager.openedSettings -= ToggleSettingsMenu;
 	}
 
 	private void Start()
@@ -141,9 +144,7 @@ public class UIManager : MonoBehaviour
 	private void Update()
 	{
 		ShowBallIndicator();
-		ShowFlagIndicator();
-
-		
+		ShowFlagIndicator();		
 	}
 
 	private void ToggleBallIndicator(bool isOff, Vector2 height)
@@ -239,6 +240,7 @@ public class UIManager : MonoBehaviour
 	private void EnableHighScoreScreen()
 	{
 		highScore.SetActive(true);
+		highScore.transform.DOLocalRotate(new Vector3(0, 0, -7f), .5f, RotateMode.Fast).SetEase(Ease.Linear).SetLoops(-1, LoopType.Yoyo);
 	}
 
 	public void ButtonPressed(int buttonIndex)
@@ -251,12 +253,14 @@ public class UIManager : MonoBehaviour
 		if (toggle)
 		{
 			settingsMenu.SetActive(true);
-			endMenu.SetActive(false);
+			pauseMenu.SetActive(false);
 			settingsMenu.transform.GetChild(0).transform.DOScale(Vector3.one, .2f).SetEase(Ease.OutBounce);
+			inSettings?.Invoke(true);
 		} else
 		{
 			settingsMenu.SetActive(false);
-			endMenu.SetActive(true);
+			pauseMenu.SetActive(true);
+			inSettings?.Invoke(false);
 		}
 	}
 
