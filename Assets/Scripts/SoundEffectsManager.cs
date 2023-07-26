@@ -55,6 +55,19 @@ public class SoundEffectsManager : MonoBehaviour
 		specialEffectsSource.PlayOneShot(clip);
 	}
 
+	public void LoopSpecialEffectAudio(AudioClip clip, float volume)
+	{
+		specialEffectsSource.volume = ExtensionMethods.Remap(volume, 0, 1, 0, _effectsVolume);
+		specialEffectsSource.loop = true;
+		specialEffectsSource.clip = clip;
+		specialEffectsSource.Play();
+	}
+
+	public void ChangeSpecialEffectsVolume(float volume)
+	{
+		specialEffectsSource.volume = ExtensionMethods.Remap(volume, 0, 1, 0, _effectsVolume);
+	}
+
 	public void StopSpecialEffectAudio()
 	{
 		specialEffectsSource.Stop();

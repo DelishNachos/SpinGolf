@@ -144,6 +144,7 @@ MonoBehaviour:
   groundDrag: 1.5
   airDrag: 0.5
   maxSpeed: 100
+  ballRollingSound: {fileID: 8300000, guid: 3c2c2745199246f4ebb506bfb90979b6, type: 3}
 --- !u!96 &1931664568
 TrailRenderer:
   serializedVersion: 2

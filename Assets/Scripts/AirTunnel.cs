@@ -46,7 +46,7 @@ public class AirTunnel : MonoBehaviour
 	{
 		if (collision.tag == "Ball")
 		{
-			Debug.Log("ForceAdded");
+			//Debug.Log("ForceAdded");
 			rb.AddForce(Vector2.up * windForce, ForceMode2D.Force);
 			rb.AddForce(storedVeloctity, ForceMode2D.Force);
 		}
