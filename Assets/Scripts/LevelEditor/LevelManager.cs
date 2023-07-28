@@ -45,7 +45,8 @@ public class LevelManager : MonoBehaviour
 		Water = 40,
 		Platforms = 50,
 		Ground = 60,
-		Misc2 = 70
+		Misc2 = 70,
+		Preview = 100
 	}
 
 	private void Update()

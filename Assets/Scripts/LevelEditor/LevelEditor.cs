@@ -6,7 +6,20 @@ using UnityEngine.Tilemaps;
 public class LevelEditor : MonoBehaviour
 {
 	[SerializeField] Tilemap defaultTilemap;
+	private Vector3Int prevPos;
 
+	Tilemap previewTilemap
+	{
+		get
+		{
+			if (LevelManager.instance.layers.TryGetValue((int)LevelManager.Tilemaps.Preview, out Tilemap tilemap)) {
+				return tilemap;
+			} else
+			{
+				return defaultTilemap;
+			}
+		}
+	}
     Tilemap currentTilemap
 	{
 		get
@@ -41,6 +54,12 @@ public class LevelEditor : MonoBehaviour
 	{
 		Vector3Int pos = currentTilemap.WorldToCell(cam.ScreenToWorldPoint(Input.mousePosition));
 
+		if (prevPos != pos)
+		{
+			UpdatePreviewTile(pos, prevPos);
+			prevPos = pos;
+		}
+
 		if (Input.GetMouseButton(0))
 		{
 			PlaceTile(pos);
@@ -55,11 +74,13 @@ public class LevelEditor : MonoBehaviour
 		{
 			_selectedTileIndex++;
 			if (_selectedTileIndex >= LevelManager.instance.tiles.Count) _selectedTileIndex = 0;
+			UpdatePreviewTile(pos, prevPos);
 		}
 		if (Input.GetKeyDown(KeyCode.Q))
 		{
 			_selectedTileIndex--;
 			if (_selectedTileIndex < 0) _selectedTileIndex = LevelManager.instance.tiles.Count - 1;
+			UpdatePreviewTile(pos, prevPos);
 		}
 	}
 
@@ -71,5 +92,20 @@ public class LevelEditor : MonoBehaviour
 	private void DeleteTile(Vector3Int pos)
 	{
 		currentTilemap.SetTile(pos, null);
+	}
+
+	private void UpdatePreviewTile(Vector3Int _pos, Vector3Int _prevPos)
+	{
+		ResetPreviewTile(_prevPos);
+		PreviewTile(_pos);
+	}
+
+	private void PreviewTile(Vector3Int pos)
+	{
+		previewTilemap.SetTile(pos, currentTile);
+	}
+	private void ResetPreviewTile(Vector3Int pos)
+	{
+		previewTilemap.SetTile(pos, null);
 	}
 }
