@@ -94,6 +94,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4416562574540608772}
   - component: {fileID: 4416562574540608773}
+  - component: {fileID: 3895935654049344356}
   m_Layer: 6
   m_Name: ClubObject
   m_TagString: Untagged
@@ -137,3 +138,35 @@ MonoBehaviour:
     m_Bits: 51
   angularVelocity: 0
   forceDamp: 75
+  noHitColor: {r: 0.764151, g: 0.764151, b: 0.764151, a: 0.73333335}
+  hitColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &3895935654049344356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4416562574540608774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 2bd3354d417850d4d91e2ab294d4713f, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: GameControls
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}

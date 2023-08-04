@@ -47,6 +47,7 @@ public class UIManager : MonoBehaviour
 
 
 	public GameObject settingsMenu;
+	public GameObject controlsMenu;
 	public Slider masterVolume;
 	public Slider musicVolume;
 	public Slider effectsVolume;
@@ -57,6 +58,7 @@ public class UIManager : MonoBehaviour
 	private float storedMusic;
 	private float storedEffects;
 	public static Action<bool> inSettings;
+	public static Action<bool> inControls;
 
 	private void OnEnable()
 	{
@@ -69,6 +71,7 @@ public class UIManager : MonoBehaviour
 		GameManager.isHighScore += EnableHighScoreScreen;
 		GameManager.pausedGame += TogglePauseMenu;
 		GameManager.openedSettings += ToggleSettingsMenu;
+		GameManager.openedControls += ToggleControlsMenu;
 	}
 
 	private void OnDisable()
@@ -82,6 +85,7 @@ public class UIManager : MonoBehaviour
 		GameManager.isHighScore -= EnableHighScoreScreen;
 		GameManager.pausedGame -= TogglePauseMenu;
 		GameManager.openedSettings -= ToggleSettingsMenu;
+		GameManager.openedControls += ToggleControlsMenu;
 	}
 
 	private void Start()
@@ -223,10 +227,10 @@ public class UIManager : MonoBehaviour
 		if (pause)
 		{
 			pauseMenu.SetActive(true);
-			pauseMenu.transform.GetChild(0).transform.DOScale(Vector3.one, .2f).SetEase(Ease.OutBounce);
+			pauseMenu.transform.GetChild(0).transform.DOScale(Vector3.one, .2f).SetEase(Ease.OutBounce).SetUpdate(true);
 		} else
 		{
-			pauseMenu.transform.GetChild(0).transform.DOScale(Vector3.one * .2f, .1f).OnComplete(() => pauseMenu.SetActive(false));
+			pauseMenu.transform.GetChild(0).transform.DOScale(Vector3.one * .2f, .1f).SetUpdate(true).OnComplete(() => pauseMenu.SetActive(false));
 		}
 	}
 
@@ -240,7 +244,7 @@ public class UIManager : MonoBehaviour
 	private void EnableHighScoreScreen()
 	{
 		highScore.SetActive(true);
-		highScore.transform.DOLocalRotate(new Vector3(0, 0, -7f), .5f, RotateMode.Fast).SetEase(Ease.Linear).SetLoops(-1, LoopType.Yoyo);
+		highScore.transform.DOLocalRotate(new Vector3(0, 0, -7f), .5f, RotateMode.Fast).SetEase(Ease.Linear).SetLoops(-1, LoopType.Yoyo).SetUpdate(true);
 	}
 
 	public void ButtonPressed(int buttonIndex)
@@ -254,14 +258,37 @@ public class UIManager : MonoBehaviour
 		{
 			settingsMenu.SetActive(true);
 			pauseMenu.SetActive(false);
-			settingsMenu.transform.GetChild(0).transform.DOScale(Vector3.one, .2f).SetEase(Ease.OutBounce);
+			settingsMenu.transform.GetChild(0).transform.DOScale(Vector3.one, .2f).SetEase(Ease.OutBounce).SetUpdate(true);
 			inSettings?.Invoke(true);
 		} else
 		{
-			settingsMenu.SetActive(false);
-			pauseMenu.SetActive(true);
+			settingsMenu.transform.GetChild(0).transform.DOScale(Vector3.one * .2f, .2f).SetEase(Ease.OutBounce).SetUpdate(true).OnComplete(() => ChangeMenu(settingsMenu));
+			//pauseMenu.SetActive(true);
 			inSettings?.Invoke(false);
 		}
+	}
+
+	public void ToggleControlsMenu(bool toggle)
+	{
+		if (toggle)
+		{
+			controlsMenu.SetActive(true);
+			pauseMenu.SetActive(false);
+			controlsMenu.transform.GetChild(0).transform.DOScale(Vector3.one, .2f).SetEase(Ease.OutBounce).SetUpdate(true);
+			inControls?.Invoke(true);
+		}
+		else
+		{
+			controlsMenu.transform.GetChild(0).transform.DOScale(Vector3.one * .2f, .2f).SetEase(Ease.OutBounce).SetUpdate(true).OnComplete(() => ChangeMenu(controlsMenu));
+			//pauseMenu.SetActive(true);
+			inControls?.Invoke(false);
+		}
+	}
+
+	private void ChangeMenu(GameObject gameObject)
+	{
+		gameObject.SetActive(false);
+		pauseMenu.SetActive(true);
 	}
 
 	public void ToggleMasterVolume()

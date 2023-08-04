@@ -22,6 +22,14 @@ namespace EasyTransition
         private void Awake()
         {
             instance = this;
+            /*if (instance == null)
+			{
+                instance = this;
+                DontDestroyOnLoad(gameObject);
+			} else
+			{
+                DestroyImmediate(gameObject);
+			}*/
         }
 
         public static TransitionManager Instance()

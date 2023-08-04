@@ -3,10 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using DG.Tweening;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Interactions;
 
 public class ClubController : MonoBehaviour
 {
-    private KeyCode[] keyCodes = {
+    #region InputSystem
+    private PlayerInput playerInput;
+    private InputAction HitBallAction;
+    private InputAction ChangeClubsAction;
+    private InputAction MousePosition;
+    private InputAction ChangeSideAction;
+	#endregion
+
+	private KeyCode[] keyCodes = {
         KeyCode.Alpha1,
         KeyCode.Alpha2,
         KeyCode.Alpha3,
@@ -28,6 +38,7 @@ public class ClubController : MonoBehaviour
 
     Vector3 mousePos;
     private bool isRight;
+    private GameObject ball;
 
 	#region Collision Detection Vars
 	Vector2 preRotation;
@@ -37,25 +48,59 @@ public class ClubController : MonoBehaviour
     public int rayAmount;
     private Vector3 rayDirection;
     public LayerMask rayLayerMask;
-    private bool canMove = true;
-    private bool canHit;
+    private bool canMove = true; //Can the club rotate
+    private bool canHit;         //Can the club hit the ball
+    private bool canSwing = true;//Can the club swing and hit the ball if can hit is true
     [SerializeField] private float angularVelocity;
     public float forceDamp;
-	#endregion
+    #endregion
+
+    [SerializeField] private Color noHitColor;
+    [SerializeField] private Color hitColor;
+    private bool isComplete;
+
+    private void Awake()
+    {
+        playerInput = GetComponent<PlayerInput>();
+        HitBallAction = playerInput.actions["HitBall"];
+        ChangeClubsAction = playerInput.actions["ScrollThroughClubs"];
+        MousePosition = playerInput.actions["MousePosition"];
+        ChangeSideAction = playerInput.actions["ChangeSides"];
+
+        ball = FindObjectOfType<BallPhysics>().gameObject;
+	}
 
 	private void OnEnable()
 	{
+        HitBallAction.Enable();
+        ChangeClubsAction.Enable();
+        MousePosition.Enable();
+        ChangeSideAction.Enable();
+
+        HitBallAction.started += CanHitBall;
+        HitBallAction.canceled += CantHitBall;
+        ChangeClubsAction.started += ChangeClub;
+        ChangeSideAction.started += ChangeSide;
+
         BallPhysics.stopped += MoveClub;
         DataHolder.addedClub += UpdateClubList;
-        CameraControls.movingEvent += CanRotateEvent;
         CheckForEnd.levelComplete += TurnOffControls;
 	}
 
 	private void OnDisable()
 	{
+        HitBallAction.Disable();
+        ChangeClubsAction.Disable();
+        MousePosition.Disable();
+        ChangeSideAction.Disable();
+
+        HitBallAction.started -= CanHitBall;
+        HitBallAction.canceled -= CantHitBall; 
+        ChangeClubsAction.started -= ChangeClub;
+        ChangeSideAction.started -= ChangeSide;
+
         BallPhysics.stopped -= MoveClub;
         DataHolder.addedClub -= UpdateClubList;
-        CameraControls.movingEvent -= CanRotateEvent;
         CheckForEnd.levelComplete -= TurnOffControls;
     }
 
@@ -67,6 +112,10 @@ public class ClubController : MonoBehaviour
         currentClubSR = clubVisual.gameObject.GetComponent<SpriteRenderer>();
         currentClubIndex = DataHolder.currentClubIndex;
         StartCoroutine(restartClubChange(currentClubIndex));
+
+        transform.position = new Vector3(ball.transform.position.x - .3f, transform.position.y, transform.position.z);
+        currentClubSR.flipX = false;
+        isRight = false;
     }
 
     // Update is called once per frame
@@ -87,27 +136,24 @@ public class ClubController : MonoBehaviour
         if (canMove)
             LookAtMouse();
 
-        if (Input.GetMouseButtonDown(0))
-		{
-            ResetRotations();
-		}
 
-        if (Input.GetMouseButton(0))
-		{
-            canHit = true;
-		} else
-		{
-            canHit = false;
-		}
-
-        if (Input.GetKeyDown(KeyCode.E)) {
+        /*if (Input.GetKeyDown(KeyCode.E)) {
             ChangeClubForward();
 		}
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
             ChangeClubBackward();
-        }
+        }*/
+
+        if (canHit)
+		{
+            if (!isComplete)
+                currentClubSR.color = hitColor;
+		} else
+		{
+            currentClubSR.color = noHitColor;
+		}
 
         for (int i = 0; i < keyCodes.Length; i++)
         {
@@ -120,11 +166,6 @@ public class ClubController : MonoBehaviour
 				}
             }
         }
-
-        if (Input.GetKeyDown(KeyCode.F))
-		{
-            ChangeSide();
-		}
     }
 
 	private void FixedUpdate()
@@ -172,6 +213,7 @@ public class ClubController : MonoBehaviour
                     float forceMag = force.magnitude;
                     SoundEffectsManager.Instance.PlaySpecialEffectAudio(currentClub.clip, ExtensionMethods.Remap(forceMag, 0, 50f, 0, 1));
                     DataHolder.addHit();
+                    canSwing = false;
                     return;
 				}
 			}
@@ -181,7 +223,7 @@ public class ClubController : MonoBehaviour
 
 	void LookAtMouse()
 	{
-        mousePos = Input.mousePosition;
+        mousePos = MousePosition.ReadValue<Vector2>();
         mousePos = Camera.main.ScreenToWorldPoint(mousePos);
         Vector3 rotation = mousePos - transform.position;
         float rotZ = Mathf.Atan2(rotation.y, rotation.x) * Mathf.Rad2Deg;
@@ -213,7 +255,7 @@ public class ClubController : MonoBehaviour
 		{
             changeIndex = 0;
 		}*/
-        for (int i = 0; i < clubs.Count - 1; i++)
+        for (int i = 0; i <= clubs.Count - 1; i++) //clubs.count - 1 = 3
         {
             if (changeIndex >= clubs.Count)
             {
@@ -270,16 +312,21 @@ public class ClubController : MonoBehaviour
         changedClub?.Invoke(index);
     }
 
-    private void ChangeSide()
+    private void ChangeSide(InputAction.CallbackContext callbackContext)
 	{
+        if (!canSwing)
+            return;
+
         if (!isRight)
 		{
-            transform.position += new Vector3(.6f, 0f, 0f);
+            //transform.position = ball.transform.position + new Vector3(.3f, 0f, 0f);
+            transform.position = new Vector3(ball.transform.position.x + .3f, transform.position.y, transform.position.z);
             currentClubSR.flipX = true;
             isRight = true;
 		} else
 		{
-            transform.position -= new Vector3(.6f, 0f, 0f);
+            //transform.position = ball.transform.position - new Vector3(.3f, 0f, 0f);
+            transform.position = new Vector3(ball.transform.position.x - .3f, transform.position.y, transform.position.z);
             currentClubSR.flipX = false;
             isRight = false;
         }
@@ -287,11 +334,14 @@ public class ClubController : MonoBehaviour
 
     private void MoveClub(Vector2 ballPos)
 	{
+        if (isComplete)
+            return;
         //canHit = false;
         TweenCallback tweenCallback = null;
         //tweenCallback += ResetRotations;
         //tweenCallback += TurnOnHit;
         transform.DOMove(new Vector3(ballPos.x - .3f, ballPos.y + 1.85f, 0f), 1f).OnComplete(tweenCallback);
+        canSwing = true;
 	}
 
     private void ResetRotations()
@@ -349,5 +399,28 @@ public class ClubController : MonoBehaviour
 	{
         canHit = false;
         canMove = false;
+        isComplete = true;
+	}
+
+    private void CanHitBall(InputAction.CallbackContext callbackContext)
+	{
+        ResetRotations();
+        canHit = true;
+	}
+
+    private void CantHitBall(InputAction.CallbackContext callbackContext)
+	{
+        canHit = false;
+	}
+
+    private void ChangeClub(InputAction.CallbackContext callbackContext)
+	{
+        if (callbackContext.ReadValue<float>() > 0)
+		{
+            ChangeClubForward();
+		} else
+		{
+            ChangeClubBackward();
+		}
 	}
 }

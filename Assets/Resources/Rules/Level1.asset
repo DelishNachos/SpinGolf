@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Level1
   m_EditorClassIdentifier: 
   hasPutter: 1
-  hasWedge: 1
+  hasWedge: 0
   hasIron: 0
   hasDriver: 0
   startingIndex: 0

@@ -39,6 +39,8 @@ public static class DataHolder
     public static float storedMasterVolume = -1f, storedMusicVolume = -1f, storedEffectsVolume = -1f;
     public static bool masterMute, musicMute, effectsMute;
 
+    public static float loadDelay = 0f;
+
     public static void InitClubs()
 	{
         if (hasPutter != _hasputter)

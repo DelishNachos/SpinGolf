@@ -14,6 +14,7 @@ public class LevelRules : ScriptableObject
 
     public void LoadRules()
 	{
+        //DataHolder.Reset(this);
         DataHolder.hasPutter = hasPutter;
         DataHolder.hasIron = hasIron;
         DataHolder.hasWedge = hasWedge;

@@ -4,10 +4,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using EasyTransition;
 
 public class LevelSelect : MonoBehaviour
 {
     public TextMeshProUGUI[] highScores;
+	[SerializeField] private TransitionSettings transition;
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +37,7 @@ public class LevelSelect : MonoBehaviour
 
     public void GoToLevel(int level)
 	{
-        SceneManager.LoadScene(level);
+		TransitionManager.Instance().Transition(level, transition, DataHolder.loadDelay);
+		//SceneManager.LoadScene(level);
 	}
 }

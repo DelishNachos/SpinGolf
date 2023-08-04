@@ -5,7 +5,7 @@ using CI.QuickSave;
 
 public class GameInitiation : MonoBehaviour
 {
-    private int[] scores;
+    [SerializeField] private int[] scores;
     public Texture2D cursor;
     public bool resetSave;
     public bool resetVolume;
@@ -20,12 +20,12 @@ public class GameInitiation : MonoBehaviour
 
             if (resetSave)
             {
-                QuickSaveWriter quickSaveWriter = QuickSaveWriter.Create("Scores");
-                quickSaveWriter.Delete("Scores");
-                PreLoadScores();
-            }
+                ResetSave();
+            } else
+			{
+                LoadScores();
+			}
 
-            LoadScores();
         } catch (QuickSaveException e)
 		{
             PreLoadScores();
@@ -72,7 +72,7 @@ public class GameInitiation : MonoBehaviour
             .Commit();
     }
 
-    private void LoadScores()
+    public void LoadScores()
 	{
         QuickSaveReader quickSaveReader = QuickSaveReader.Create("Scores");
         IEnumerable<string> keys = quickSaveReader.GetAllKeys();
@@ -114,4 +114,12 @@ public class GameInitiation : MonoBehaviour
         DataHolder.musicMute = quickSaveReader.Read<bool>("MusicMute");
         DataHolder.effectsMute = quickSaveReader.Read<bool>("EffectsMute");
 	}
+
+    public void ResetSave()
+	{
+        QuickSaveWriter quickSaveWriter = QuickSaveWriter.Create("Volume");
+        quickSaveWriter.Delete("Volume");
+        PreLoadScores();
+        LoadScores();
+    }
 }
