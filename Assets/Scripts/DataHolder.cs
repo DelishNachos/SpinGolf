@@ -7,6 +7,7 @@ using CI.QuickSave;
 public static class DataHolder
 {
     public static Action<ClubObject> addedClub;
+    public static Action firstHit;
     public static Action<int> hitBall;
 
     public static bool hasPutter;
@@ -26,12 +27,15 @@ public static class DataHolder
     public static int currentClubIndex = 0;
     public static int hits = 0;
 
+    public static float currentTime = 0f;
+
     public static bool isInWater = false;
     public static bool isInHole = false;
 
     public static bool isPaused;
 
     public static int[] highScores;
+    public static float[] lowTimes;
 
     public static float masterVolume = .5f;
     public static float musicVolume = 1f;
@@ -40,6 +44,7 @@ public static class DataHolder
     public static bool masterMute, musicMute, effectsMute;
 
     public static float loadDelay = 0f;
+    public static int levelCount = 8; //One less than amount of levels
 
     public static void InitClubs()
 	{
@@ -99,10 +104,16 @@ public static class DataHolder
         isInHole = false;
         isPaused = false;
         hits = 0;
+        currentTime = 0;
 	}
 
     public static void addHit()
 	{
+        if (hits == 0)
+		{
+            firstHit?.Invoke();
+		}
+
         hits++;
         hitBall?.Invoke(hits);
 	}
@@ -136,13 +147,13 @@ public static class DataHolder
         }
     }
 
-    public static bool SaveData(int score, int level)
+    public static bool SaveScoreData(int score, int level)
 	{
         bool isHigh = false;
         QuickSaveReader quickSaveReader = QuickSaveReader.Create("Scores");
         IEnumerable<string> keys = quickSaveReader.GetAllKeys();
         QuickSaveWriter quickSaveWriter = QuickSaveWriter.Create("Scores");
-        int counter = 8;
+        int counter = levelCount;
         foreach (string key in keys)
 		{
             int highScore = quickSaveReader.Read<int>(key);
@@ -162,6 +173,33 @@ public static class DataHolder
         }
         return isHigh; 
 	}
+
+    public static bool SaveTimeData(float time, int level)
+	{
+        bool isHigh = false;
+        QuickSaveReader quickSaveReader = QuickSaveReader.Create("Times");
+        IEnumerable<string> keys = quickSaveReader.GetAllKeys();
+        QuickSaveWriter quickSaveWriter = QuickSaveWriter.Create("Times");
+        int counter = levelCount;
+        foreach (string key in keys)
+        {
+            float highTime = quickSaveReader.Read<float>(key);
+            if (counter == level - 1)
+            {
+                if (time < highTime || highTime == -1f)
+                {
+                    highTime = time;
+                    isHigh = true;
+                }
+            }
+            quickSaveWriter.Write(key, highTime);
+            quickSaveWriter.Commit();
+            if (lowTimes != null)
+                lowTimes[counter] = highTime;
+            counter--;
+        }
+        return isHigh;
+    }
 
     public static void SaveVolumeData()
 	{

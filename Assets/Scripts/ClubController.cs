@@ -395,7 +395,7 @@ public class ClubController : MonoBehaviour
         ChangeClubIndex(currentClubIndex);
     }
 
-    private void TurnOffControls(int hits)
+    private void TurnOffControls(int hits, float time)
 	{
         canHit = false;
         canMove = false;

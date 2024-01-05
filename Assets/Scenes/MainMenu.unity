@@ -5854,9 +5854,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scores: 
+  times: []
   cursor: {fileID: 2800000, guid: e3ccad7599250b54f8a5834b39729ad0, type: 3}
   resetSave: 0
   resetVolume: 0
+  levelCount: 9
 --- !u!4 &1672037867
 Transform:
   m_ObjectHideFlags: 0

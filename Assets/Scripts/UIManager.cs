@@ -37,12 +37,15 @@ public class UIManager : MonoBehaviour
 	private bool showFlagIndicator;
 
 	public TextMeshProUGUI hitCounter;
+	public TextMeshProUGUI timeCounter;
 
 	public GameObject pauseMenu;
 
 	public GameObject endMenu;
 	public GameObject highScore;
+	public GameObject bestTime;
 	public TextMeshProUGUI hitsText;
+	public TextMeshProUGUI timeText;
 	public static Action<int> pressedButton;
 
 
@@ -69,6 +72,7 @@ public class UIManager : MonoBehaviour
 		CheckForEnd.VisibleEvent += ToggleFlagIndicator;
 		CheckForEnd.levelComplete += EnableEndScreen;
 		GameManager.isHighScore += EnableHighScoreScreen;
+		GameManager.isLowTime += EnableBestTimeScreen;
 		GameManager.pausedGame += TogglePauseMenu;
 		GameManager.openedSettings += ToggleSettingsMenu;
 		GameManager.openedControls += ToggleControlsMenu;
@@ -83,6 +87,7 @@ public class UIManager : MonoBehaviour
 		CheckForEnd.VisibleEvent -= ToggleFlagIndicator;
 		CheckForEnd.levelComplete -= EnableEndScreen;
 		GameManager.isHighScore -= EnableHighScoreScreen;
+		GameManager.isLowTime -= EnableBestTimeScreen;
 		GameManager.pausedGame -= TogglePauseMenu;
 		GameManager.openedSettings -= ToggleSettingsMenu;
 		GameManager.openedControls += ToggleControlsMenu;
@@ -148,7 +153,8 @@ public class UIManager : MonoBehaviour
 	private void Update()
 	{
 		ShowBallIndicator();
-		ShowFlagIndicator();		
+		ShowFlagIndicator();
+		UpdateTimeCounter(DataHolder.currentTime);
 	}
 
 	private void ToggleBallIndicator(bool isOff, Vector2 height)
@@ -222,6 +228,11 @@ public class UIManager : MonoBehaviour
 		hitCounter.text = hits.ToString();
 	}
 
+	private void UpdateTimeCounter(float time)
+	{
+		timeCounter.text = time.ToString("#.00").Replace(".", ":");
+	}
+
 	private void TogglePauseMenu(bool pause)
 	{
 		if (pause)
@@ -234,10 +245,11 @@ public class UIManager : MonoBehaviour
 		}
 	}
 
-	private void EnableEndScreen(int hits)
+	private void EnableEndScreen(int hits, float time)
 	{
 		endMenu.SetActive(true);
 		hitsText.text = "Hits:" + hits.ToString();
+		timeText.text = "Time:" + time.ToString("#.00").Replace(".", ":");
 		endMenu.transform.GetChild(0).transform.DOScale(Vector3.one , .2f).SetEase(Ease.OutBounce);
 	}
 
@@ -245,6 +257,12 @@ public class UIManager : MonoBehaviour
 	{
 		highScore.SetActive(true);
 		highScore.transform.DOLocalRotate(new Vector3(0, 0, -7f), .5f, RotateMode.Fast).SetEase(Ease.Linear).SetLoops(-1, LoopType.Yoyo).SetUpdate(true);
+	}
+
+	private void EnableBestTimeScreen()
+	{
+		bestTime.SetActive(true);
+		bestTime.transform.DOLocalRotate(new Vector3(0, 0, -7f), .5f, RotateMode.Fast).SetEase(Ease.Linear).SetLoops(-1, LoopType.Yoyo).SetUpdate(true);
 	}
 
 	public void ButtonPressed(int buttonIndex)

@@ -17,11 +17,16 @@ public class GameManager : MonoBehaviour
 	public static Action<bool> openedSettings;
 	public static Action<bool> openedControls;
 	public static Action isHighScore;
+	public static Action isLowTime;
 	private bool isPaused;
 	private bool inSettings;
 	private bool inControls;
 
 	public int[] scores;
+	public float[] times;
+
+	public bool isTiming = false;
+	public float currentTime = 0f;
 
 	#region Input Actions
 	[SerializeField] private PlayerInput playerInput;
@@ -43,6 +48,7 @@ public class GameManager : MonoBehaviour
 
 		CheckForEnd.levelComplete += EndLevel;
 		WaterScript.StuckInWater += RestartLevel;
+		DataHolder.firstHit += StartTimer;
 		UIManager.pressedButton += DetermineButtonAction;
 		BallPhysics.ballOffCameraX += RestartLevel;
 		UIManager.inSettings += toggleSettingsBool;
@@ -62,6 +68,7 @@ public class GameManager : MonoBehaviour
 
 		CheckForEnd.levelComplete -= EndLevel;
 		WaterScript.StuckInWater -= RestartLevel;
+		DataHolder.firstHit -= StartTimer;
 		UIManager.pressedButton -= DetermineButtonAction;
 		BallPhysics.ballOffCameraX -= RestartLevel;
 		UIManager.inSettings -= toggleSettingsBool;
@@ -82,18 +89,38 @@ public class GameManager : MonoBehaviour
 	{
 		levelRules.LoadRules();
 		scores = DataHolder.highScores;
+		times = DataHolder.lowTimes;
 	}
 
 	private void Update()
 	{
-
+		if (isTiming)
+		{
+			currentTime += Time.deltaTime;
+			DataHolder.currentTime = currentTime;
+		}
 	}
 
-	public void EndLevel(int hits)
+	public void StartTimer()
 	{
-		bool isHigh = DataHolder.SaveData(hits, SceneManager.GetActiveScene().buildIndex);
+		isTiming = true;
+	}
+
+	public void EndTimer()
+	{
+		isTiming = false;
+	}
+
+	public void EndLevel(int hits, float time)
+	{
+		bool isHigh = DataHolder.SaveScoreData(hits, SceneManager.GetActiveScene().buildIndex);
 		if (isHigh)
 			isHighScore?.Invoke();
+
+		EndTimer();
+		bool isLow = DataHolder.SaveTimeData(time, SceneManager.GetActiveScene().buildIndex);
+		if (isLow)
+			isLowTime?.Invoke();
 	}
 
 	private void DetermineButtonAction(int index)

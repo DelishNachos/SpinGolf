@@ -6,14 +6,20 @@ using CI.QuickSave;
 public class GameInitiation : MonoBehaviour
 {
     [SerializeField] private int[] scores;
+    [SerializeField] private float[] times;
     public Texture2D cursor;
     public bool resetSave;
     public bool resetVolume;
+    public int levelCount = 9;
 
     // Start is called before the first frame update
     void Awake()
     {
-        scores = new int[9];
+        scores = new int[levelCount];
+        times = new float[levelCount];
+        DataHolder.levelCount = levelCount - 1;
+
+        //load scores
         try
 		{
             QuickSaveReader quickSaverReader = QuickSaveReader.Create("Scores");
@@ -32,6 +38,28 @@ public class GameInitiation : MonoBehaviour
             LoadScores();
 		}
 
+        //load times
+        try
+        {
+            QuickSaveReader quickSaverReader = QuickSaveReader.Create("Times");
+
+            if (resetSave)
+            {
+                ResetSave();
+            }
+            else
+            {
+                LoadTimes();
+            }
+
+        }
+        catch (QuickSaveException e)
+        {
+            PreLoadTimes();
+            LoadTimes();
+        }
+
+        //load volume
         try
 		{
             QuickSaveReader quickSaveReader = QuickSaveReader.Create("Volume");
@@ -76,7 +104,7 @@ public class GameInitiation : MonoBehaviour
 	{
         QuickSaveReader quickSaveReader = QuickSaveReader.Create("Scores");
         IEnumerable<string> keys = quickSaveReader.GetAllKeys();
-        int counter = 8;
+        int counter = DataHolder.levelCount;
         foreach (string key in keys)
 		{
             scores[counter] = quickSaveReader.Read<int>(key);
@@ -84,6 +112,34 @@ public class GameInitiation : MonoBehaviour
 		}
         DataHolder.highScores = scores;
 	}
+
+    private void PreLoadTimes()
+    {
+        QuickSaveWriter.Create("Times")
+            .Write("Level1", -1)
+            .Write("Level2", -1)
+            .Write("Level3", -1)
+            .Write("Level4", -1)
+            .Write("Level5", -1)
+            .Write("Level6", -1)
+            .Write("Level7", -1)
+            .Write("Level8", -1)
+            .Write("Level9", -1)
+            .Commit();
+    }
+
+    public void LoadTimes()
+	{
+        QuickSaveReader quickSaveReader = QuickSaveReader.Create("Times");
+        IEnumerable<string> keys = quickSaveReader.GetAllKeys();
+        int counter = DataHolder.levelCount;
+        foreach (string key in keys)
+        {
+            times[counter] = quickSaveReader.Read<float>(key);
+            counter--;
+        }
+        DataHolder.lowTimes = times;
+    }
 
     private void PreLoadVolume()
 	{
@@ -121,5 +177,7 @@ public class GameInitiation : MonoBehaviour
         quickSaveWriter.Delete("Volume");
         PreLoadScores();
         LoadScores();
+        PreLoadTimes();
+        LoadTimes();
     }
 }
